@@ -18,3 +18,5 @@ for i in range(0,1000):
     check(lfld) 
 
 GPIO.cleanup()
+
+#hi
