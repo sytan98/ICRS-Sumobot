@@ -1,5 +1,8 @@
 import RPi.GPIO as IO 
 import time 
+
+class infrared():
+    
 '''
 # check function 
 def check(lfld):

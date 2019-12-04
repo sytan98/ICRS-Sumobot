@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import time
-
+import infrared
+import ultrasound
+import output
 
 # left turn
 def leftturn():
