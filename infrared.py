@@ -1,36 +1,14 @@
-import RPi.GPIO as IO 
+#import RPi.GPIO as IO 
+import wiringpi2 as wiringpi  
 import time 
 
-class infrared():
-    
-'''
-# check function 
-def check(lfld):
-    time.sleep(.3)
-    print GPIO.input(lfld)
-    return 
-
-# to use Raspberry Pi board pin numbers 
-GPIO.setmode(GPIO.BOARD) 
-
-# set up GPIO output channel
-lfld = 15  #left front line detector
-
-GPIO.setup(lfld, GPIO.IN)
-# check the sensor 1000 times
-for i in range(0,1000): 
-    check(lfld) 
-
-GPIO.cleanup()
-
-
-
+"""
 Input:
 1 or 0 (true or false)
 Interrupt pin says if any IR sensor is triggered
 UART pin says which IR sensor is triggered
 e.g. IR sensors labelled clockwise from front
-    
+
 Output:
 Heading (where it is facing) (0 to 359)
 Angle (direction in which we want to move relative to heading) (0 to 359)
@@ -40,8 +18,41 @@ Velocity in angle (0 to 255)
 Will output two arrays
 1) Move away from triggered sensor direction
 2) Spin towards centre
-'''
+"""
+class infrared:
 
+# Initializer / Instance Attributes
+    def __init__(self, triggerpin, uartpin, numbers):
+        self.triggerpin = triggerpin
+        self.uartpin = uartpin
+        self.numbers = numbers
+
+#reading input function
+    def readheading(self):
+        wiringpi.wiringPiSetupGpio()  
+        wiringpi.pinMode(self.pin, 0)
+        ser = wiringpi.serialOpen('/dev/serial0', 115200)
+        data = []
+        while True:
+            data.append(wiringpi.serialGetchar(ser))
+            print(wiringpi.serialGetchar(ser))
+            sleep(0.03)
+        return data
+
+    #get perpendicular angle (0-359)
+    def calculate():
+        if (sensor <= 4):
+            perpendicular = (sensor * 45 - 22.5) + 180
+        elif (sensor > 4):
+            perpendicular = (sensor * 45 - 22.5) - 180
+        return perpendicular
+
+    def check(self):
+        return "{} and {}".format(self.triggerpin, self.numbers)
+    
+    
+
+"""
 #setup pins
 UART_pin=15
 trigger=2
@@ -67,3 +78,4 @@ if (triggered==True):
 # Could this perpendicular angle change after moving backwards? e.g. being pushed...?
 # We could use computer vision at this point to make sure we don't rotate away from robot and instead rotate until it is facing the opponent.
     
+"""
