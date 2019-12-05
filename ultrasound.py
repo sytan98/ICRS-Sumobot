@@ -4,14 +4,26 @@ from time import sleep
 
 class ultrasound:
 
-    # Initializer / Instance Attributes with default values
     def __init__(self, serial_port="/dev/serial0",
                  baud_rate=115200,
                  sleep_time=0.03):
+        """
+        Args:
+            serial_port (str): The location of serial port
+                               Defaults to "/dev/serial0"
+            baud_rate (int): Rate information is read from control side
+            sleep_time (float): Time between reads(?)
+
+        Raises:
+            FileNotFoundError : If serial port cannot be found
+        """
         self.change_baud_rate(baud_rate)
         self.serial_port = serial_port
 
-        self.ser = serial.Serial(serial_port, baud_rate)
+        try:
+            self.ser = serial.Serial(serial_port, baud_rate)
+        except serial.serialutil.SerialException:
+            raise FileNotFoundError("Serial port not found")
 
     # Reading input function
     def read(self):
@@ -48,8 +60,8 @@ class ultrasound:
         return self.ser.Open()
 
     def baud_rate_is_in_range(baud_rate_to_check):
-        """Checks that baud rate is between 0 and 250000"""
-        try:
+        """Checks that baud rate is between 0 and 250000 and is int"""
+        if isinstance(baud_rate_to_check, int):
             return (baud_rate_to_check < 0) or (baud_rate_to_check >= 250000)
-        except TypeError:
+        else:
             return False
