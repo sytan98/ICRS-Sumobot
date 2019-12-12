@@ -7,15 +7,6 @@ infrared.c --> Contains the class of infrared sensors with instance methods such
 
 distance.c --> Contains the class of ultrasound sensors with instance methods such as read() to read input data from uart pins.
 
-struct ultrasound{
-            int name;
-            float distance;
-}
-
-ultrasound read_distance(){
-            returns the name of the ultrasound that is closest to the enemy and the distance
-}
-
 opticalflow.c -> Contains the class of optical flow sensors with instance methods such as read() to read input data from ? pins.
 
 main.c --> Main script that imports ir sensor libraries and ultrasound sensor libraries to do various actions which can be broken down into
