@@ -47,3 +47,4 @@ Hardware abstraction layer (HAL) provides us a high level, high abstraction libr
 ## Useful links:
 Link about how to use branches: https://confluence.atlassian.com/bitbucket/branching-a-repository-223217999.html
 How to program STM32: https://medium.com/microcontroller-for-not-so-dummy/how-to-program-an-stm32-c3ea2f7c8f8a?
+https://simonmartin.ch/resources/stm32/dl/
