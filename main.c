@@ -1,6 +1,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include<stdio.h>
+#include <stdio.h>
+#include "infrared.h"
+#include "distance.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
