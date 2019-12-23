@@ -33,7 +33,7 @@ int main(void) {
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
-      do_something()
+      getDistance()
     }
     /* USER CODE END WHILE */
 }

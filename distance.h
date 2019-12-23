@@ -41,4 +41,6 @@ float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin){
     return cachedDistance;
 }
 
+#endif
+
 
