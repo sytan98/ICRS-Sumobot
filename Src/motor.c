@@ -1,9 +1,5 @@
 #include "motor.h"
 
-void move_forward(int speed){
-
-}
-
-void move_backward(int speed){
+void moveSteering(int speed1, int speed2, int speed3, int speed4){
     
 }
