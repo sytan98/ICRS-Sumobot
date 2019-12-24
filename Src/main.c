@@ -19,7 +19,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char string[] = "hello world";
+char string[] = "hello";
 /* USER CODE END PV */
 
 int main(void) {
