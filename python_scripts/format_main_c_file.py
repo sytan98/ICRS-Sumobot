@@ -11,9 +11,9 @@ def main():
         print("Output file exists!")
 
 
-def replace_c_file(src="../main.c",
+def replace_c_file(src="../Src/main.c",
                    out="../formatted_main.c",
-                   template="../main_full_template.c"):
+                   template="../Src/main_full_template.c"):
 
     # Check to ensure src and template files exist, and out file does not exist
     if os.path.isfile(out):
@@ -27,11 +27,14 @@ def replace_c_file(src="../main.c",
     re_typedefs = re.compile("/\* USER CODE BEGIN PTD \*/.*/\* USER CODE END PTD \*/", re.DOTALL)
     re_defines = re.compile("/\* USER CODE BEGIN PD \*/.*/\* USER CODE END PD \*/", re.DOTALL)
     re_variables = re.compile("/\* USER CODE BEGIN PV \*/.*/\* USER CODE END PV \*/", re.DOTALL)
+    re_functions_declare = re.compile("/\* USER CODE BEGIN PFP \*/.*/\* USER CODE END PFP \*/", re.DOTALL)
     re_init_code = re.compile("/\* USER CODE BEGIN 2 \*/.*/\* USER CODE END 2 \*/", re.DOTALL)
     re_while_code = re.compile("/\* USER CODE BEGIN WHILE \*/.*/\* USER CODE END WHILE \*/", re.DOTALL)
+    re_functions_define = re.compile("/\* USER CODE BEGIN 4 \*/.*/\* USER CODE END 4 \*/", re.DOTALL)
 
     re_list = [re_includes, re_typedefs, re_defines,
-               re_variables, re_init_code, re_while_code]
+               re_variables, re_init_code, re_while_code,
+               re_functions_declare, re_functions_define]
 
     # Attempt to find main file, search for user written code
     with open(src, "r") as input_file:
