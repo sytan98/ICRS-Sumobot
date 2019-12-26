@@ -1,9 +1,9 @@
 #include "infrared.h"
 
-void linedetected(int n){
-    if (get_distance(n)<10){
-        move_forward(100);
+void lineDetected(int n){
+    if (getDistance(n)<10){
+        moveForward(100);
     } else {
-        move_backward(100);
+        moveBackwards(100);
     }
 }
