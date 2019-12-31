@@ -43,8 +43,9 @@ int getEnemy(){
 	for(int i=0; i<8; i++){
 		sensor[i]= getDistance(Trig_Port1, Trig_Pin1, Echo_Port1, Echo_Pin1);
 
-		// depending on how the ports and pins are named for loop may not be used
 	}
+	// TODO: for loop may not be used here depending on how ports are named
+
 	int dist1 = INT_MAX;
 	int dist2 = INT_MAX;
 	int sensor1 = 0;
@@ -64,11 +65,12 @@ int getEnemy(){
 		}
 	}
 
-	if(sensor2<sensor1){
+	if(sensor2 < sensor1){
 		int tmp = sensor2;
 		sensor2 = sensor1;
 		sensor1 = tmp;
 	}
+
 	int final = sensor1*10 + sensor2;
 	return final;
 }
