@@ -14,7 +14,7 @@ float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Ech
     //     return cachedDistance;
 
     float local_time=0;
-	HAL_GPIO_WritePin(Trig_Port, Trig_Pin, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
+	HAL_GPIO_WritePin(Trig_Port, Trig_Pin, GPIO_PIN_RESET);  // pull the TRIG pin LOW
 	delay(2);  // wait for 2 us
 
 
@@ -30,10 +30,47 @@ float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Ech
 		local_time++;   // measure time for which the pin is high
 		delay (1);
 	 }
-	
-    
+
     cachedDistance = (local_time * .0343)/2;
 
     // lastUpdated = millis();
     return cachedDistance;
+}
+
+int getEnemy(){
+	float sensor[8];
+
+	for(int i=0; i<8; i++){
+		sensor[i]= getDistance(Trig_Port1, Trig_Pin1, Echo_Port1, Echo_Pin1); //do it 8 times for each sensor from 1 to 8
+
+		// depending on how the ports and pins are named for loop may not be used
+	}
+	int dist1;
+	int dist2;
+	int sensor1 = 0;
+	int sensor2 = 0;
+
+	dist1 = dist2 = INT_MAX;
+
+	// only works if 2 smallest distance sensors are next to each other, but what if they are not?
+	for(int i=0; i<8; i++){
+		if(sensor[i]<dist1){
+			dist2 = dist1;
+			sensor2 = sensor1;
+			dist1 = sensor[i];
+			sensor1 = i;
+		}
+		else if (sensor[i]<dist2 && sensor[i] > dist1){
+			dist2 = sensor[i];
+			sensor2 = i;
+		}
+	}
+
+	if(sensor2<sensor1){
+		int tmp = sensor2;
+		sensor2 = sensor1;
+		sensor1 = tmp;
+	}
+	int final = sensor1*10 + sensor2;
+	return final;
 }
