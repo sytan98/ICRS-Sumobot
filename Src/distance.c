@@ -41,18 +41,16 @@ int getEnemy(){
 	float sensor[8];
 
 	for(int i=0; i<8; i++){
-		sensor[i]= getDistance(Trig_Port1, Trig_Pin1, Echo_Port1, Echo_Pin1); //do it 8 times for each sensor from 1 to 8
+		sensor[i]= getDistance(Trig_Port1, Trig_Pin1, Echo_Port1, Echo_Pin1);
 
 		// depending on how the ports and pins are named for loop may not be used
 	}
-	int dist1;
-	int dist2;
+	int dist1 = INT_MAX;
+	int dist2 = INT_MAX;
 	int sensor1 = 0;
 	int sensor2 = 0;
 
-	dist1 = dist2 = INT_MAX;
-
-	// only works if 2 smallest distance sensors are next to each other, but what if they are not?
+	// TODO: what if 2 smallest distance sensors are not next to each other
 	for(int i=0; i<8; i++){
 		if(sensor[i]<dist1){
 			dist2 = dist1;
@@ -60,7 +58,7 @@ int getEnemy(){
 			dist1 = sensor[i];
 			sensor1 = i;
 		}
-		else if (sensor[i]<dist2 && sensor[i] > dist1){
+		else if (sensor[i] < dist2 && sensor[i] > dist1){
 			dist2 = sensor[i];
 			sensor2 = i;
 		}
