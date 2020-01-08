@@ -206,19 +206,19 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
   //This will be front right sensor
   if(__HAL_GPIO_EXTI_GET_FLAG(GPIO_PIN_12)){
-    linedetected(12);
+    lineDetected(12);
   }
   //This will be back right sensor
   if(__HAL_GPIO_EXTI_GET_FLAG(GPIO_PIN_13)){
-    linedetected(13);
+    lineDetected(13);
   }
   //This will be back left sensor
   if(__HAL_GPIO_EXTI_GET_FLAG(GPIO_PIN_14)){
-    linedetected(14);
+    lineDetected(14);
   }  
   //This will be front left sensor
   if(__HAL_GPIO_EXTI_GET_FLAG(GPIO_PIN_15)){
-    linedetected(15);
+    lineDetected(15);
   } 
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
