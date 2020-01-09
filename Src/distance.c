@@ -25,6 +25,8 @@ float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Ech
 	// read the time for which the pin is high
 
 	while (!(HAL_GPIO_ReadPin(Echo_Port, Echo_Pin)));  // wait for the ECHO pin to go high
+
+	//TODO: what if there is no echo because nothing is detected
 	while (HAL_GPIO_ReadPin(Echo_Port, Echo_Pin))    // while the pin is high
 	 {
 		local_time++;   // measure time for which the pin is high
@@ -37,7 +39,7 @@ float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Ech
     return cachedDistance;
 }
 
-int getEnemy(){
+us_sensor getClosestEnemies(){
 	float sensor[8];
 
 	for(int i=0; i<8; i++){
@@ -59,18 +61,37 @@ int getEnemy(){
 			dist1 = sensor[i];
 			sensor1 = i;
 		}
-		else if (sensor[i] < dist2 && sensor[i] > dist1){
+		else if(sensor[i] < dist2 && sensor[i] > dist1){
+			dist2 = sensor[i];
+			sensor2 = i;
+		}
+		// same value of distance
+		else if(sensor[i] < dist2 && sensor[i] = dist1){
 			dist2 = sensor[i];
 			sensor2 = i;
 		}
 	}
 
-	if(sensor2 < sensor1){
+	int final_name;
+	// if nothing is detected
+	if(dist1 == dist2 && dist1 == 0){
+		final_name = 0;
+	}
+	//reorganise the order of two sensors if they are not in the correct order
+	else if (sensor2 < sensor1){
 		int tmp = sensor2;
 		sensor2 = sensor1;
 		sensor1 = tmp;
+
+		final_name = sensor1*10 + sensor2;
+	}
+	else {
+		final_name = sensor1*10 + sensor2;
 	}
 
-	int final = sensor1*10 + sensor2;
-	return final;
+	us_sensor result;
+	result.name = final_name;
+	result.distance = min(dist1, dist2);
+
+	return result;
 }

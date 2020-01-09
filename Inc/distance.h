@@ -5,10 +5,15 @@
 #include "gpio.h"
 #include "tim.h"
 
+struct us_sensor{
+  int name;
+  float distance;
+}
+
 void delay (float us);
 
 float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port , uint32_t Echo_Pin);
 
-int getEnemy();
+us_sensor getClosestEnemies();
 
 #endif
