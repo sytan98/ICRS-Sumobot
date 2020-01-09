@@ -13,5 +13,5 @@ void moveForward(int8_t speed) {
 }
 
 void moveBackwards(int8_t speed) {
-    moveForward(speed);
+    moveForward(-speed);
 }
