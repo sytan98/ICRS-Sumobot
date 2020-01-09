@@ -8,7 +8,7 @@
 struct us_sensor{
   int name;
   float distance;
-}
+};
 
 void delay (float us);
 
