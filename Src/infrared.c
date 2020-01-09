@@ -1,13 +1,12 @@
 #include "infrared.h"
-#include "distance.c"
 
 void lineDetected(int n){
     // TODO: update getDistance to accept single int argument only
     // TODO: Create new function getSingleClosestEnemy in distance.c
     // (maybe) create a function that handles when the enemy is NE/NW/SE/SW and
     // use it in both infrared.c and in main.c
-    int enemyLocation = getSingleClosestEnemy();
-    float distance = getDistance(n);
+    int enemyLocation = 12;//getSingleClosestEnemy();
+    float distance = 0.05; //getDistance(n);
 
     // if line detected is NE
     if (n == 1) {
