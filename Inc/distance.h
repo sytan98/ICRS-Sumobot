@@ -8,11 +8,17 @@
 struct us_sensor{
   int name;
   float distance;
+  GPIO_TypeDef* Trig_Port;
+  uint32_t Trig_Pin;
+  GPIO_TypeDef* Echo_Port;
+  uint32_t Echo_Pin;
 };
 
 void delay (float us);
 
-float getDistance(GPIO_TypeDef* Trig_Port , uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port , uint32_t Echo_Pin);
+us_sensor createSensor(us_sensor sensor, int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin)
+
+float getDistance(us_sensor sensor);
 
 us_sensor getClosestEnemies();
 
