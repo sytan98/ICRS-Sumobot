@@ -1,9 +1,25 @@
 #include "distance.h"
 
-void delay (float us)
-{
-	__HAL_TIM_SET_COUNTER(&htim1, 0);
-	while ((__HAL_TIM_GET_COUNTER(&htim1))<us);
+
+volatile unsigned int *DWT_CYCCNT = (volatile unsigned int *)0xE0001004; //address of the register
+volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000; //address of the register
+volatile unsigned int *SCB_DEMCR = (volatile unsigned int *)0xE000EDFC; //address of the register
+
+void timer_init(void){
+    *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
+    *DWT_CYCCNT = 0; // reset the counter
+    *DWT_CONTROL = *DWT_CONTROL | 1 ; // enable the counter
+}
+
+void delay(unsigned int tick){
+    // Compare current time with start time to see if delay period has ended.
+    unsigned int start, current;
+    start = *DWT_CYCCNT;
+
+    do {
+        current = *DWT_CYCCNT;
+    }
+    while((current - start) < tick * 10);
 }
 
 float cachedDistance = 1000.0f;
@@ -39,7 +55,7 @@ float getDistance(us_sensor sensor){
 		delay (1);
 	 }
 
-    cachedDistance = (local_time * .0343)/2;
+    cachedDistance = (local_time * .0343)/2 * 3;
 
     // lastUpdated = millis();
     return cachedDistance;

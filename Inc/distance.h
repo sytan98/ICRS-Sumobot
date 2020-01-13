@@ -14,9 +14,11 @@ struct us_sensor{
   uint32_t Echo_Pin;
 };
 
-void delay (float us);
+void timer_init(void);
 
-us_sensor createSensor(us_sensor sensor, int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin)
+void delay(unsigned int tick);
+
+us_sensor createSensor(us_sensor sensor, int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin);
 
 float getDistance(us_sensor sensor);
 

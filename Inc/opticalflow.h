@@ -10,8 +10,8 @@ UART_HandleTypeDef huart2;
 
 // Timer Registers for delayMicroseconds
 volatile unsigned int *DWT_CYCCNT = (volatile unsigned int *)0xE0001004; //address of the register
-volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000; //address of the register 
-volatile unsigned int *SCB_DEMCR = (volatile unsigned int *)0xE000EDFC; //address of the register 
+volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000; //address of the register
+volatile unsigned int *SCB_DEMCR = (volatile unsigned int *)0xE000EDFC; //address of the register
 
 // Define Functions:
 void delayMicroseconds(unsigned int tick);
@@ -27,12 +27,12 @@ void registerWrite(uint8_t reg, uint8_t value) {
 
 	// Pull CS low to initiate
 	HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_RESET);
-	
+
   delayMicroseconds(50);
-	
+
 	HAL_SPI_Transmit(&hspi1, &reg, 1, 5);
 	HAL_SPI_Transmit(&hspi1, &value, 1, 5);
-	
+
   delayMicroseconds(50);
 
   HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_SET);
@@ -47,13 +47,13 @@ uint8_t registerRead(uint8_t reg) {
   HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_RESET);
 
   delayMicroseconds(50);
-	
+
   HAL_SPI_Transmit(&hspi1, &reg, 1, 5);
-	
+
   delayMicroseconds(50);
-	
+
   HAL_SPI_Receive(&hspi1, &value, 1, 5);
-	
+
   delayMicroseconds(200);
 
   HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_SET);
@@ -83,7 +83,7 @@ void initRegisters() {
   registerWrite(0x7F, 0x03);
   registerWrite(0x40, 0x00);
   registerWrite(0x7F, 0x05);
-	
+
   registerWrite(0x41, 0xB3);
   registerWrite(0x43, 0xF1);
   registerWrite(0x45, 0x14);
@@ -97,13 +97,13 @@ void initRegisters() {
   registerWrite(0x7F, 0x08);
   registerWrite(0x65, 0x20);
   registerWrite(0x6A, 0x18);
-	
+
   registerWrite(0x7F, 0x09);
   registerWrite(0x4F, 0xAF);
   registerWrite(0x5F, 0x40);
   registerWrite(0x48, 0x80);
   registerWrite(0x49, 0x80);
-	
+
   registerWrite(0x57, 0x77);
   registerWrite(0x60, 0x78);
   registerWrite(0x61, 0x78);
@@ -113,13 +113,13 @@ void initRegisters() {
   registerWrite(0x45, 0x60);
   registerWrite(0x7F, 0x00);
   registerWrite(0x4D, 0x11);
-	
+
   registerWrite(0x55, 0x80);
   registerWrite(0x74, 0x1F);
   registerWrite(0x75, 0x1F);
   registerWrite(0x4A, 0x78);
   registerWrite(0x4B, 0x78);
-	
+
   registerWrite(0x44, 0x08);
   registerWrite(0x45, 0x50);
   registerWrite(0x64, 0xFF);
@@ -144,7 +144,7 @@ void initRegisters() {
   registerWrite(0x70, 0x00);
 
   HAL_Delay(10);
-	
+
   registerWrite(0x32, 0x44);
   registerWrite(0x7F, 0x07);
   registerWrite(0x40, 0x40);
@@ -155,19 +155,19 @@ void initRegisters() {
   registerWrite(0x48, 0xC0);
   registerWrite(0x6F, 0xd5);
   registerWrite(0x7F, 0x00);
-	
+
   registerWrite(0x5B, 0xa0);
   registerWrite(0x4E, 0xA8);
   registerWrite(0x5A, 0x50);
   registerWrite(0x40, 0x80);
-	
+
 	HAL_Delay(100);
-	
+
 	// Enable LED pulsing
 	registerWrite(0x7F, 0x14);
   registerWrite(0x6F, 0x1C);
   registerWrite(0x7F, 0x00);
-	
+
 }
 
 
@@ -178,7 +178,7 @@ uint8_t initPMW3901(){
 	*SCB_DEMCR = *SCB_DEMCR | 0x01000000;
 	*DWT_CYCCNT = 0; // reset the counter
 	*DWT_CONTROL = *DWT_CONTROL | 1 ; // enable the counter
-	
+
   // Make sure the SPI bus is reset
 	HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_SET);
 	HAL_Delay(1);
@@ -186,7 +186,7 @@ uint8_t initPMW3901(){
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(CS_OF_GPIO_Port, CS_OF_Pin, GPIO_PIN_SET);
 	HAL_Delay(1);
-	
+
   // Power on reset
   registerWrite(0x3A, 0x5A);
   HAL_Delay(5);
