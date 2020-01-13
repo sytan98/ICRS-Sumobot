@@ -5,26 +5,47 @@ void lineDetected(int n){
     // TODO: Create new function getSingleClosestEnemy in distance.c
     // (maybe) create a function that handles when the enemy is NE/NW/SE/SW and
     // use it in both infrared.c and in main.c
-    int enemyLocation = 12;//getSingleClosestEnemy();
-    float distance = 0.05; //getDistance(n);
+    struct us_sensor us1 = getClosestEnemies();
+    int enemyLocation = us1.name;
+    float distance = us1.distance;
 
     // if line detected is NE
     if (n == 1) {
-        // and enemy is NE, BAMBOOZLED! so continue NE
-        if ((enemyLocation == 1 || enemyLocation == 2) && distance < 5) {
-            moveTank(100, 75);
-        } else { // actual line, so move backwards
-            moveTank(-100, -90);
+        while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
+                                infrared1_gpio_Pin)) {
+            // and enemy is NE, BAMBOOZLED! so continue NE
+            if ((enemyLocation == 1) && distance < 10) {
+                moveTank(100, 75);
+                uint8_t greenLEDMessage[] = "interrupt 1, case 1\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+            } else { // actual line, so move backwards
+                moveTank(-100, -90);
+                uint8_t greenLEDMessage[] = "interrupt1, case 2\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+            }
+            HAL_Delay(2000);
         }
     }
 
     // if line detected is SE
     if (n == 2) {
         // and enemy is behind us, rotate clockwise
-        if ((enemyLocation == 3 || enemyLocation == 4) && distance < 5) {
-            moveTank(75, -75);
-        } else { // actual line, so move forwards
-            moveTank(90, 100);
+        while (!HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
+                                infrared2_gpio_Pin)) {
+            if ((enemyLocation == 2) && distance < 10) {
+                uint8_t greenLEDMessage[] = "interrupt2, case 1\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(75, -75);
+            } else { // actual line, so move forwards
+                uint8_t greenLEDMessage[] = "interrupt2, case 2\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(90, 100);
+            }
+            HAL_Delay(2000);
         }
     }
 

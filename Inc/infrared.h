@@ -6,6 +6,7 @@
 
 #include "distance.h"
 #include "motor.h"
+#include "usart.h"
 
 void lineDetected(int n);
 
