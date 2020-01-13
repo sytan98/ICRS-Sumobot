@@ -18,10 +18,10 @@ void timer_init(void);
 
 void delay(unsigned int tick);
 
-us_sensor createSensor(us_sensor sensor, int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin);
+struct us_sensor createSensor(int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin);
 
-float getDistance(us_sensor sensor);
+float getDistance(struct us_sensor sensor);
 
-us_sensor getClosestEnemies();
+struct us_sensor getClosestEnemies();
 
 #endif

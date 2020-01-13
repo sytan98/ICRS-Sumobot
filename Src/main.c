@@ -104,56 +104,79 @@ int main(void)
     while (1) {
 
         // TEST STUFF
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        uint8_t hello[13] = "HelloWorld\r\n";
-        HAL_UART_Transmit(&huart2, hello, sizeof(hello) - 1, 1000);
+//        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+//        uint8_t hello[13] = "HelloWorld\r\n";
+//        HAL_UART_Transmit(&huart2, hello, sizeof(hello) - 1, 1000);
 
         //delay(2000000);
         HAL_Delay(200);
 
-        int dist = getDistance(ultrasound_trigger_GPIO_Port, ultrasound_trigger_Pin, ultrasound_echo_GPIO_Port, ultrasound_echo_Pin);
+        struct us_sensor us1 = createSensor("ultrasound1",
+                ultrasound2_trigger_GPIO_Port,
+                ultrasound2_trigger_Pin,
+                ultrasound2_echo_GPIO_Port,
+                ultrasound2_echo_Pin);
+        int dist = getDistance(us1);
+//        struct us_sensor us_res = getClosestEnemies();
+//        int dist = us_res.distance;
+
         uint8_t str[7];
         sprintf((char*)str, "%05d\r\n", dist);
         HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
+
         // TEST STUFF END
 
         // Logic if enemy is detected
         // Assume locateEnemy is defined in distance.c and returns an int corresponding to location of enemy
         // 00 = Enemy not seen, 18 = Enemy between ultrasound 1 & 8, etc
-        int enemyLocation = 12;//getClosestEnemies();
-        if (enemyLocation == 0) {
+        struct us_sensor enemyLocation = getClosestEnemies();
+        if (enemyLocation.name == 0) {
             moveTank(10, 10);
             delay(50);
             moveTank(0, 0);
             continue;
         } else {
-            switch (enemyLocation) {
-                case 18:
-                    // Enemy is N, move straight ahead
-                    moveTank(100, 100);
-                case 12:
-                    // Enemy is NE, move straight, but turn right a little
-                    moveTank(100, 75);
-                case 23:
-                    // Enemy is E, turn right
-                    moveTank(50, -50);
-                case 34:
-                    // Enemy is SE, turn right faster
-                    moveTank(75, -75);
-                case 45:
-                    // Enemy is S, turn around asap
-                    moveTank(100, -100);
-                case 56:
-                    // Enemy is SW, turn left faster
-                    moveTank(-75, 75);
-                case 67:
-                    // Enemy is W, turn left
-                    moveTank(-50, 50);
-                case 78:
-                    // Enemy is NE, move straight, but turn left a little
-                    moveTank(75, 100);
+            switch (enemyLocation.name) {
+                case 1: //Enemy is NNE, move slightly to the right
+                    HAL_UART_Transmit(&huart2, "moving NNE\r\n", 12 - 1, 1000);
+                    moveTank(100, 80);
+                    break;
+                case 2:
+                    // Enemy is NE, move more to the right
+                    HAL_UART_Transmit(&huart2, "moving ENE\r\n", 12 - 1, 1000);
+                    moveTank(100, 70);
+                    break;
+                case 3:
+                    // Enemy is ESE, turn right
+                    HAL_UART_Transmit(&huart2, "moving ESE\r\n", 12 - 1, 1000);
+                    moveTank(100, -50);
+                    break;
+                case 4:
+                    // Enemy is SSE, turn right faster
+                    HAL_UART_Transmit(&huart2, "moving SSE\r\n", 12 - 1, 1000);
+                    moveTank(100, -75);
+                    break;
+                case 5:
+                    // Enemy is SSW, turn left faster
+                    HAL_UART_Transmit(&huart2, "moving SSW\r\n", 12 - 1, 1000);
+                    moveTank(-75, 100);
+                    break;
+                case 6:
+                    // Enemy is WSW, turn left
+                    HAL_UART_Transmit(&huart2, "moving WSW\r\n", 12 - 1, 1000);
+                    moveTank(-50, 100);
+                    break;
+                case 7:
+                    // Enemy is NW, move more to the left
+                    HAL_UART_Transmit(&huart2, "moving WNW\r\n", 12 - 1, 1000);
+                    moveTank(70, 100);
+                    break;
+                case 8://Enemy is NNW, move slightly to the right
+                    HAL_UART_Transmit(&huart2, "moving NNW\r\n", 12 - 1, 1000);
+                    moveTank(80, 100);
+                    break;
             }
-//            delay(50);
+            HAL_Delay(50);
         }
 
     }
@@ -181,21 +204,21 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }

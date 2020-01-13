@@ -1,6 +1,6 @@
 #include "distance.h"
 
-
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 volatile unsigned int *DWT_CYCCNT = (volatile unsigned int *)0xE0001004; //address of the register
 volatile unsigned int *DWT_CONTROL = (volatile unsigned int *)0xE0001000; //address of the register
 volatile unsigned int *SCB_DEMCR = (volatile unsigned int *)0xE000EDFC; //address of the register
@@ -25,12 +25,12 @@ void delay(unsigned int tick){
 float cachedDistance = 1000.0f;
 
 // TODO: use pointers or just create in main
-us_sensor createSensor(us_sensor sensor, int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin){
-	sensor = {name, 0, Trig_Port, Trig_Pin, Echo_Port, Echo_Pin};
+struct us_sensor createSensor(int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin){
+    struct us_sensor sensor = {name, 0, Trig_Port, Trig_Pin, Echo_Port, Echo_Pin};
 	return sensor;
 }
 
-float getDistance(us_sensor sensor){
+float getDistance(struct us_sensor sensor){
     // // don't try to update more quickly than the delay... in the meantime, return a cached value.
     // if(millis() - lastUpdated < ultrasonicDelayMs)
     //     return cachedDistance;
@@ -55,7 +55,7 @@ float getDistance(us_sensor sensor){
 		delay (1);
 	 }
 
-    cachedDistance = (local_time * .0343)/2 * 3;
+    cachedDistance = (local_time * .0343)/2 * 20;
 
     // lastUpdated = millis();
     return cachedDistance;
@@ -65,17 +65,43 @@ float getDistance(us_sensor sensor){
 		// return sensor;
 }
 
-us_sensor getClosestEnemies(){
+struct us_sensor getClosestEnemies(){
 	float sensor[8];
+	const int INT_MAX = 10000;
 
-	sensor[0]= getDistance(sensor1);
-	sensor[1]= getDistance(sensor2);
-	sensor[2]= getDistance(sensor3);
-	sensor[3]= getDistance(sensor4);
-	sensor[4]= getDistance(sensor5);
-	sensor[5]= getDistance(sensor6);
-	sensor[6]= getDistance(sensor7);
-	sensor[7]= getDistance(sensor8);
+	struct us_sensor ultrasoundsensor1 = createSensor(00,
+	                                          ultrasound1_trigger_GPIO_Port,
+	                                        ultrasound1_trigger_Pin,
+	                                        ultrasound1_echo_GPIO_Port,
+	                                        ultrasound1_echo_Pin);
+
+    struct us_sensor ultrasoundsensor2 = createSensor(00,
+                                            ultrasound2_trigger_GPIO_Port,
+                                            ultrasound2_trigger_Pin,
+                                            ultrasound2_echo_GPIO_Port,
+                                            ultrasound2_echo_Pin);
+
+    struct us_sensor ultrasoundsensor8 = createSensor(00,
+                                                      ultrasound8_trigger_GPIO_Port,
+                                                      ultrasound8_trigger_Pin,
+                                                      ultrasound8_echo_GPIO_Port,
+                                                      ultrasound8_echo_Pin);
+
+    struct us_sensor ultrasoundsensor7 = createSensor(00,
+                                                      ultrasound7_trigger_GPIO_Port,
+                                                      ultrasound7_trigger_Pin,
+                                                      ultrasound7_echo_GPIO_Port,
+                                                      ultrasound7_echo_Pin);
+
+
+	sensor[0]= getDistance(ultrasoundsensor1);
+	sensor[1]= getDistance(ultrasoundsensor2);
+	sensor[2]= getDistance(ultrasoundsensor7);
+	sensor[3]= getDistance(ultrasoundsensor8);
+//	sensor[4]= getDistance(sensor5);
+//	sensor[5]= getDistance(sensor6);
+//	sensor[6]= getDistance(sensor7);
+//	sensor[7]= getDistance(sensor8);
 
 	int dist1 = INT_MAX;
 	int dist2 = INT_MAX;
@@ -83,21 +109,21 @@ us_sensor getClosestEnemies(){
 	int sensor2 = 0;
 
 	// TODO: what if 2 smallest distance sensors are not next to each other
-	for(int i=0; i<8; i++){
+	for(int i=0; i<4; i++){
 		if(sensor[i]<dist1){
 			dist2 = dist1;
 			sensor2 = sensor1;
 			dist1 = sensor[i];
-			sensor1 = i;
+			sensor1 = i+1;
 		}
 		else if(sensor[i] < dist2 && sensor[i] > dist1){
 			dist2 = sensor[i];
-			sensor2 = i;
+			sensor2 = i+1;
 		}
 		// same value of distance
-		else if(sensor[i] < dist2 && sensor[i] = dist1){
+		else if(sensor[i] < dist2 && sensor[i] == dist1){
 			dist2 = sensor[i];
-			sensor2 = i;
+			sensor2 = i+1;
 		}
 	}
 
@@ -112,13 +138,15 @@ us_sensor getClosestEnemies(){
 		sensor2 = sensor1;
 		sensor1 = tmp;
 
-		final_name = sensor1*10 + sensor2;
+//		final_name = sensor1 * 10 + sensor2;
+        final_name = sensor2;
 	}
 	else {
-		final_name = sensor1*10 + sensor2;
+//		final_name = sensor1 * 10 + sensor2;
+		final_name = sensor1;
 	}
 
-	us_sensor result = {final_name, min(dist1, dist2), nullptr, 0, nullptr, 0};
+    struct us_sensor result = {final_name, MIN(dist1, dist2), NULL, 0, NULL, 0};
 
 	return result;
 }
