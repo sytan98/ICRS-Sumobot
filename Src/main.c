@@ -20,17 +20,19 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
+#include "i2c.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include <distance.h>
-#include <infrared.h>
-#include <motor.h>
+#include "distance.h"
+#include "infrared.h"
+#include "motor.h"
 #include <stdlib.h>
+#include "opticalflow.h"
 
 /* USER CODE END Includes */
 
@@ -71,7 +73,13 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+    uint8_t hello[15] = "Hello World!\r\n";
+    uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
+    uint8_t txBuf[30];
 
+    int16_t deltaX = 0, deltaY = 0;
+    int16_t *deltaXptr = &deltaX;
+    int16_t *deltaYptr = &deltaY;
   /* USER CODE END 1 */
   
 
@@ -93,10 +101,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_TIM1_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  timer_init();
+    HAL_UART_Transmit(&huart2, hello, sizeof(hello), 5);
+    if(initPMW3901())
+        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
+
+    HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -104,21 +117,6 @@ int main(void)
     while (1) {
 
         // TEST STUFF
-//        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-//        uint8_t hello[13] = "HelloWorld\r\n";
-//        HAL_UART_Transmit(&huart2, hello, sizeof(hello) - 1, 1000);
-
-        //delay(2000000);
-        HAL_Delay(200);
-
-        struct us_sensor us1 = createSensor("ultrasound1",
-                ultrasound2_trigger_GPIO_Port,
-                ultrasound2_trigger_Pin,
-                ultrasound2_echo_GPIO_Port,
-                ultrasound2_echo_Pin);
-        int dist = getDistance(us1);
-//        struct us_sensor us_res = getClosestEnemies();
-//        int dist = us_res.distance;
 
         uint8_t str[7];
         sprintf((char*)str, "%05d\r\n", dist);
@@ -179,6 +177,7 @@ int main(void)
             HAL_Delay(50);
         }
 
+
     }
 
     /* USER CODE END WHILE */
@@ -222,8 +221,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
-  PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
