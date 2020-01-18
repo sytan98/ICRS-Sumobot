@@ -1,0 +1,16 @@
+/home/tianyilim/Downloads/clion-2019.3.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/tianyilim/ICRS-Sumobot/motor_driver
+-- The C compiler identification is GNU 6.3.1
+-- The CXX compiler identification is GNU 6.3.1
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/arm-none-eabi-gcc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/tianyilim/ICRS-Sumobot/motor_driver/cmake-build-debug
