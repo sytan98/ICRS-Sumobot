@@ -28,7 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "motor_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,10 +98,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   //  we have 4 pwm channels
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  pwm_init();
 
   /* USER CODE END 2 */
 
@@ -112,6 +109,55 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//
+    for(int i=0; i<100; i++){
+        moveRightMotor(i);
+        HAL_Delay(5);
+    }
+
+    for(int i=0; i<100; i++){
+          moveRightMotor(100-i);
+          HAL_Delay(5);
+    }
+
+    for(int i=0; i<100; i++){
+          moveRightMotor(-1*i);
+          HAL_Delay(5);
+    }
+
+    for(int i=0; i<100; i++){
+          moveRightMotor(-1*(100-i));
+          HAL_Delay(5);
+    }
+
+
+//    for(int i=100; i>-100; i--){
+//        moveRightMotor(i);
+//        HAL_Delay(5);
+//    }
+//
+//    for(int i=-100; i<100; i++){
+//        moveRightMotor(i);
+//        HAL_Delay(5);
+//    }
+
+
+//    for (int i=0; i<100; i++){
+//        analogWrite(1, i);
+//        analogWrite(2, 100-i);
+//        analogWrite(3, i);
+//        analogWrite(4, 100-i);
+//        HAL_Delay(10);
+//    }
+//
+//    for (int i=0; i<100; i++){
+////        htim1.Instance->CCR1 = i;
+//          analogWrite(1, 100-i);
+//          analogWrite(2, i);
+//          analogWrite(3, 100-i);
+//          analogWrite(4, i);
+//          HAL_Delay(10);
+//      }
   }
   /* USER CODE END 3 */
 }

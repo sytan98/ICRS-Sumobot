@@ -58,8 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define D7_CH3_Pin GPIO_PIN_0
-#define D7_CH3_GPIO_Port GPIOF
+#define ultrasound2_echo_Pin GPIO_PIN_0
+#define ultrasound2_echo_GPIO_Port GPIOF
 #define ultrasound3_echo_Pin GPIO_PIN_1
 #define ultrasound3_echo_GPIO_Port GPIOF
 #define infrared1_gpio_Pin GPIO_PIN_0
@@ -78,8 +78,8 @@ void Error_Handler(void);
 #define D9_CH1_GPIO_Port GPIOA
 #define D1_CH2_Pin GPIO_PIN_9
 #define D1_CH2_GPIO_Port GPIOA
-#define ultrasound2_echo_Pin GPIO_PIN_10
-#define ultrasound2_echo_GPIO_Port GPIOA
+#define D0_CH3_Pin GPIO_PIN_10
+#define D0_CH3_GPIO_Port GPIOA
 #define D10_CH4_Pin GPIO_PIN_11
 #define D10_CH4_GPIO_Port GPIOA
 #define ultrasound1_echo_Pin GPIO_PIN_12
