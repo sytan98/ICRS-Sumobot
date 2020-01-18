@@ -8,7 +8,8 @@
 #include "main.h"
 #include "tim.h"
 
-// define functions
-void analogWrite(int speed);
+//
+// define primitive functions
+void analogWrite(GPIO_t int speed);
 
 #endif //MOTOR_DRIVER_MOTOR_DRIVER_H
