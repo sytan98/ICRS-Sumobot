@@ -34,6 +34,7 @@
 #include "motor.h"
 #include <stdlib.h>
 #include "opticalflow.h"
+#include "compass.h"
 
 /* USER CODE END Includes */
 
@@ -112,6 +113,8 @@ int main(void)
         HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
 
     HAL_Delay(1000);
+    compass_init();
+    HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,10 +122,17 @@ int main(void)
     while (1) {
 
         // TEST STUFF
+        struct mag_struct mag_values = read_mag_values(&hi2c1);
+        uint8_t transmitX[30];
+        uint8_t transmitY[30];
+//        float finalVal = atan2(mag_values.x, mag_values.y);
+        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
+        // as described on arduino library
+        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
+        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
+        print_f(transmitX);
+        print_f(transmitY);
 
-        uint8_t str[7];
-        sprintf((char*)str, "%05d\r\n", dist);
-        HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
 
         // TEST STUFF END
 
@@ -132,7 +142,7 @@ int main(void)
         struct us_sensor enemyLocation = getClosestEnemies();
         if (enemyLocation.name == 0) {
             moveTank(10, 10);
-            delay(50);
+            delayMicroseconds(50);
             moveTank(0, 0);
             continue;
         } else {
