@@ -1,5 +1,6 @@
 #ifndef motor_h
 #define motor_h
+#include "tim.h"
 
 // define primitive functions
 void pwm_init(void);
