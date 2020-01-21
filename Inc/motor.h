@@ -1,6 +1,9 @@
 #ifndef motor_h
 #define motor_h
 
+#include "main.h"
+#include "tim.h"
+
 // define primitive functions
 void pwm_init(void);
 void analogWrite(int pin, int speed);
