@@ -30,11 +30,10 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "distance.h"
-#include "infrared.h"
 #include "motor.h"
-#include <stdlib.h>
 #include "opticalflow.h"
 #include "compass.h"
+#include "CompassOptical.h"
 
 /* USER CODE END Includes */
 
@@ -108,13 +107,26 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-    HAL_UART_Transmit(&huart2, hello, sizeof(hello), 5);
-    if(initPMW3901())
-        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
+//    HAL_UART_Transmit(&huart2, hello, sizeof(hello), 5);
+//    if (initPMW3901s())
+//        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
+//
+//    HAL_Delay(1000);
+//    compass_init();
+//    HAL_Delay(1000);
+    startAngle = 0;
+    updatePos(0, 0, 0);
+    printf("current pos: x:%d, y:%d\n", (int)xycoords[0], (int)xycoords[1]);
+    updatePolarCoords();
+    printf("current polar pos: r:%f, theta:%f\n", polarcoords[0], polarcoords[1]);
 
-    HAL_Delay(1000);
-    compass_init();
-    HAL_Delay(1000);
+    updateMaxSensorRange(0);
+
+    for(int i = 0; i < 6; i++){
+        printf("Sensor %d reading: %f\n", i, maxSensorRange[i]);
+    }
+
+    HAL_Delay(500);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,17 +134,7 @@ int main(void)
     while (1) {
 
         // TEST STUFF
-        struct mag_struct mag_values = read_mag_values(&hi2c1);
-        uint8_t transmitX[30];
-        uint8_t transmitY[30];
-//        float finalVal = atan2(mag_values.x, mag_values.y);
-        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
-        // as described on arduino library
-        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
-        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
-        print_f(transmitX);
-        print_f(transmitY);
-
+        HAL_Delay(500);
 
         // TEST STUFF END
 
@@ -253,7 +255,7 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+    /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
