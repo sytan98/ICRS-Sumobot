@@ -76,12 +76,12 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
     uint8_t hello[15] = "Hello World!\r\n";
-    uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
-    uint8_t txBuf[30];
-
-    int16_t deltaX = 0, deltaY = 0;
-    int16_t *deltaXptr = &deltaX;
-    int16_t *deltaYptr = &deltaY;
+//    uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
+//    uint8_t txBuf[30];
+//
+//    int16_t deltaX = 0, deltaY = 0;
+//    int16_t *deltaXptr = &deltaX;
+//    int16_t *deltaYptr = &deltaY;
   /* USER CODE END 1 */
   
 
@@ -109,12 +109,17 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
     HAL_UART_Transmit(&huart2, hello, sizeof(hello), 5);
-    if(initPMW3901())
-        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
-
-    HAL_Delay(1000);
+//    if(initPMW3901())
+//        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
+//
+//    HAL_Delay(1000);
     compass_init();
     HAL_Delay(1000);
+    #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+    #define MAX(x, y) (((x) > (y)) ? (x) : (y))
+    struct mag_struct running_min;
+    struct mag_struct running_max;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -123,73 +128,90 @@ int main(void)
 
         // TEST STUFF
         struct mag_struct mag_values = read_mag_values(&hi2c1);
+//
+//        running_min.x = MIN(running_min.x, mag_values.x);
+//        running_min.y = MIN(running_min.y, mag_values.y);
+//        running_min.z = MIN(running_min.z, mag_values.z);
+//
+//        running_max.x = MAX(running_max.x, mag_values.x);
+//        running_max.y = MAX(running_max.y, mag_values.y);
+//        running_max.z = MAX(running_max.z, mag_values.z);
+//
+//        uint8_t report[80];
+//        snprintf(report, sizeof(report), "min: {%+6d, %+6d, %+6d}    max: {%+6d, %+6d, %+6d}\n\n",
+//                 running_min.x, running_min.y, running_min.z,
+//                 running_max.x, running_max.y, running_max.z);
+//        print_f(report);
+
         uint8_t transmitX[30];
         uint8_t transmitY[30];
-//        float finalVal = atan2(mag_values.x, mag_values.y);
+        uint8_t transmit[30];
+//        float finalVal = atan2(mag_values.x, mag_values.y) * 1000;
         // TODO: Need to calibrate compass readings, maybe using idea of max and min value
         // as described on arduino library
         sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
-        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
+//        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
+//        sprintf((char *) transmit, "reading is %05d\r\n\n", (int) finalVal);
         print_f(transmitX);
-        print_f(transmitY);
+//        print_f(transmitY);
+//        print_f(transmit);
 
+        HAL_Delay(500);
 
         // TEST STUFF END
 
         // Logic if enemy is detected
         // Assume locateEnemy is defined in distance.c and returns an int corresponding to location of enemy
         // 00 = Enemy not seen, 18 = Enemy between ultrasound 1 & 8, etc
-        struct us_sensor enemyLocation = getClosestEnemies();
-        if (enemyLocation.name == 0) {
-            moveTank(10, 10);
-            delayMicroseconds(50);
-            moveTank(0, 0);
-            continue;
-        } else {
-            switch (enemyLocation.name) {
-                case 1: //Enemy is NNE, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNE\r\n", 12 - 1, 1000);
-                    moveTank(100, 80);
-                    break;
-                case 2:
-                    // Enemy is NE, move more to the right
-                    HAL_UART_Transmit(&huart2, "moving ENE\r\n", 12 - 1, 1000);
-                    moveTank(100, 70);
-                    break;
-                case 3:
-                    // Enemy is ESE, turn right
-                    HAL_UART_Transmit(&huart2, "moving ESE\r\n", 12 - 1, 1000);
-                    moveTank(100, -50);
-                    break;
-                case 4:
-                    // Enemy is SSE, turn right faster
-                    HAL_UART_Transmit(&huart2, "moving SSE\r\n", 12 - 1, 1000);
-                    moveTank(100, -75);
-                    break;
-                case 5:
-                    // Enemy is SSW, turn left faster
-                    HAL_UART_Transmit(&huart2, "moving SSW\r\n", 12 - 1, 1000);
-                    moveTank(-75, 100);
-                    break;
-                case 6:
-                    // Enemy is WSW, turn left
-                    HAL_UART_Transmit(&huart2, "moving WSW\r\n", 12 - 1, 1000);
-                    moveTank(-50, 100);
-                    break;
-                case 7:
-                    // Enemy is NW, move more to the left
-                    HAL_UART_Transmit(&huart2, "moving WNW\r\n", 12 - 1, 1000);
-                    moveTank(70, 100);
-                    break;
-                case 8://Enemy is NNW, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNW\r\n", 12 - 1, 1000);
-                    moveTank(80, 100);
-                    break;
-            }
-            HAL_Delay(50);
-        }
-
-
+//        struct us_sensor enemyLocation = getClosestEnemies();
+//        if (enemyLocation.name == 0) {
+//            moveTank(10, 10);
+//            delayMicroseconds(50);
+//            moveTank(0, 0);
+//            continue;
+//        } else {
+//            switch (enemyLocation.name) {
+//                case 1: //Enemy is NNE, move slightly to the right
+//                    HAL_UART_Transmit(&huart2, "moving NNE\r\n", 12 - 1, 1000);
+//                    moveTank(100, 80);
+//                    break;
+//                case 2:
+//                    // Enemy is NE, move more to the right
+//                    HAL_UART_Transmit(&huart2, "moving ENE\r\n", 12 - 1, 1000);
+//                    moveTank(100, 70);
+//                    break;
+//                case 3:
+//                    // Enemy is ESE, turn right
+//                    HAL_UART_Transmit(&huart2, "moving ESE\r\n", 12 - 1, 1000);
+//                    moveTank(100, -50);
+//                    break;
+//                case 4:
+//                    // Enemy is SSE, turn right faster
+//                    HAL_UART_Transmit(&huart2, "moving SSE\r\n", 12 - 1, 1000);
+//                    moveTank(100, -75);
+//                    break;
+//                case 5:
+//                    // Enemy is SSW, turn left faster
+//                    HAL_UART_Transmit(&huart2, "moving SSW\r\n", 12 - 1, 1000);
+//                    moveTank(-75, 100);
+//                    break;
+//                case 6:
+//                    // Enemy is WSW, turn left
+//                    HAL_UART_Transmit(&huart2, "moving WSW\r\n", 12 - 1, 1000);
+//                    moveTank(-50, 100);
+//                    break;
+//                case 7:
+//                    // Enemy is NW, move more to the left
+//                    HAL_UART_Transmit(&huart2, "moving WNW\r\n", 12 - 1, 1000);
+//                    moveTank(70, 100);
+//                    break;
+//                case 8://Enemy is NNW, move slightly to the right
+//                    HAL_UART_Transmit(&huart2, "moving NNW\r\n", 12 - 1, 1000);
+//                    moveTank(80, 100);
+//                    break;
+//            }
+//            HAL_Delay(50);
+//        }
     }
 
     /* USER CODE END WHILE */

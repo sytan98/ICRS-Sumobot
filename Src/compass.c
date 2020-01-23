@@ -148,6 +148,14 @@ struct mag_struct read_mag_values(I2C_HandleTypeDef *i2c) {
     uint8_t zVal = val[2] << 8 | val[3];
     uint8_t yVal = val[4] << 8 | val[5];
 
+    uint8_t transmitX[30];
+    sprintf((char *) transmitX, "x reading is %05d\r\n", (int) val[1]);
+//    print_f(transmitX);
+
+//    xVal -= (5 + 250) / 2;
+//    yVal -= (3 + 251) / 2;
+//    zVal -= (1 + 254) / 2;
+
     struct mag_struct mag_readings = {xVal, yVal, zVal};
     return mag_readings;
 }
