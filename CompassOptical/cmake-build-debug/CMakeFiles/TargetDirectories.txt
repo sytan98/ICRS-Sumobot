@@ -1,0 +1,3 @@
+/home/tianyilim/CLionProjects/CompassOptical/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/tianyilim/CLionProjects/CompassOptical/cmake-build-debug/CMakeFiles/CompassOptical.dir
+/home/tianyilim/CLionProjects/CompassOptical/cmake-build-debug/CMakeFiles/edit_cache.dir
