@@ -144,13 +144,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  uint8_t hello[15] = "Hello World!\r\n";
-  uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
-  uint8_t txBuf[30];
-
-  int16_t deltaX = 0, deltaY = 0;
-  int16_t *deltaXptr = &deltaX;
-  int16_t *deltaYptr = &deltaY;
+  uint8_t hello[15] = "Hello World!\n";
   /* USER CODE END 1 */
   
 
@@ -178,8 +172,13 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM15_Init();
   /* USER CODE BEGIN 2 */
+  DWT_Init();
   pwm_init();
-  printf("Helloworld\n");
+  timer_init();
+//  run_tests();
+  HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
+  delay(2000);
+  printf("yolosawg");
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
@@ -188,9 +187,9 @@ int main(void)
   //Reads for CH3 on rc receiver (left toggle)
   HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
 
-  HAL_Delay(5000);
+  HAL_Delay(2000);
   //Wait for instructions
-  while(CH2_Difference>1300 & CH2_Difference<2000){}
+//  while(CH2_Difference>1300 & CH2_Difference<2000){}
   if (CH2_Difference > 2000){
       //Go into control mode
       while(1){
@@ -215,23 +214,23 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
+        struct us_sensor us1 = createSensor("ultrasound1",
+                                            ultrasound_trigger_GPIO_Port,
+                                            ultrasound_trigger_Pin,
+                                            ultrasound4_echo_GPIO_Port,
+                                            ultrasound4_echo_Pin);
+        int dist = getDistance(us1);
+
+        uint8_t str[7];
+        sprintf((char*)str, "%05d\r\n", dist);
+        HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
+
+        // TEST STUFF
         printf("Wow i'm moving by myself\n");
-
-        // Compass TEST STUFF
-//        struct mag_struct mag_values = read_mag_values(&hi2c1);
-//        uint8_t transmitX[30];
-//        uint8_t transmitY[30];
-//        //float finalVal = atan2(mag_values.x, mag_values.y);
-//        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
-//        // as described on arduino library
-//        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
-//        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
-//        print_f(transmitX);
-//        print_f(transmitY);
-
+        HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
 
         // TEST STUFF END
-
+        /*
         // Logic if enemy is detected
         // Assume locateEnemy is defined in distance.c and returns an int corresponding to location of enemy
         // 00 = Enemy not seen, 18 = Enemy between ultrasound 1 & 8, etc
@@ -283,7 +282,9 @@ int main(void)
                     break;
             }
             HAL_Delay(50);
+
         }
+         */
     }
 
     /* USER CODE END WHILE */

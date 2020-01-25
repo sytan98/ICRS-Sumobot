@@ -16,4 +16,7 @@ void delayMicroseconds(uint32_t us);
 void error(int errorCode);
 void print_f(char msg[]);
 
+void timer_init(void);
+void delay(unsigned int tick);
+
 #endif //ICRS_SUMOBOT_TIM_H

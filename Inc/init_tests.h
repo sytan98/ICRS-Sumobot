@@ -1,10 +1,10 @@
 #ifndef ICRS_SUMOBOT_INIT_TESTS_H
 #define ICRS_SUMOBOT_INIT_TESTS_H
 
-#import "utils.h"
-#import "distance.h"
-#import "infrared.h"
-#import "motor.h"
+#include "utils.h"
+#include "distance.h"
+#include "infrared.h"
+#include "motor.h"
 
 #define ULTRASOUND_TEST_DISTANCE 10.0 //Distance in cm
 
