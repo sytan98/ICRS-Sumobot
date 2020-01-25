@@ -38,21 +38,19 @@ struct us_sensor createSensor(int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_P
 }
 
 float getDistance(struct us_sensor sensor){
-    // // don't try to update more quickly than the delay... in the meantime, return a cached value.
-    // if(millis() - lastUpdated < ultrasonicDelayMs)
-    //     return cachedDistance;
 
     float local_time=0;
+
+    // Reset pin
     HAL_GPIO_WritePin(sensor.Trig_Port, sensor.Trig_Pin, GPIO_PIN_RESET);  // pull the TRIG pin LOW
     delayMicroseconds(2);  // wait for 2 us
 
-
+    // Send trigger ultrasound wave
     HAL_GPIO_WritePin(sensor.Trig_Port, sensor.Trig_Pin, GPIO_PIN_SET);  // pull the TRIG pin HIGH
     delayMicroseconds(10);  // wait for 10 us
     HAL_GPIO_WritePin(sensor.Trig_Port, sensor.Trig_Pin, GPIO_PIN_RESET);  // pull the TRIG pin low
 
-    // read the time for which the pin is high
-
+    // Read the time for which the pin is high
     while (!(HAL_GPIO_ReadPin(sensor.Echo_Port, sensor.Echo_Pin)));  // wait for the ECHO pin to go high
 
     //TODO: what if there is no echo because nothing is detected
@@ -64,12 +62,7 @@ float getDistance(struct us_sensor sensor){
 
     cachedDistance = (local_time * .0343)/2 * 20;
 
-    // lastUpdated = millis();
     return cachedDistance;
-
-    // return the same sensor struct with a distance value?
-    // sensor.distance = cachedDistance;
-    // return sensor;
 }
 
 struct us_sensor getClosestEnemies(){
