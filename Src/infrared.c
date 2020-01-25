@@ -1,6 +1,6 @@
 #include "infrared.h"
 
-void lineDetected(int n){
+void lineDetected(int n) {
     // TODO: update getDistance to accept single int argument only
     // TODO: Create new function getSingleClosestEnemy in distance.c
     // (maybe) create a function that handles when the enemy is NE/NW/SE/SW and
@@ -12,7 +12,7 @@ void lineDetected(int n){
     // if line detected is NE
     if (n == 1) {
         while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
-                                infrared1_gpio_Pin)) {
+                                 infrared1_gpio_Pin)) {
             // and enemy is NE, BAMBOOZLED! so continue NE
             if ((enemyLocation == 1) && distance < 10) {
                 moveTank(100, 75);
@@ -33,7 +33,7 @@ void lineDetected(int n){
     if (n == 2) {
         // and enemy is behind us, rotate clockwise
         while (!HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
-                                infrared2_gpio_Pin)) {
+                                 infrared2_gpio_Pin)) {
             if ((enemyLocation == 2) && distance < 10) {
                 uint8_t greenLEDMessage[] = "interrupt2, case 1\r\n";
                 HAL_UART_Transmit(&huart2, greenLEDMessage,
@@ -89,3 +89,4 @@ void lineDetected(int n){
             HAL_Delay(2000);
         }
     }
+}
