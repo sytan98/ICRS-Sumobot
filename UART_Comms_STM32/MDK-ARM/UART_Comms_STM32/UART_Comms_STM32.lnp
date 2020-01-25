@@ -1,0 +1,26 @@
+--cpu=Cortex-M4.fp.sp
+"uart_comms_stm32\startup_stm32f410rx.o"
+"uart_comms_stm32\main.o"
+"uart_comms_stm32\stm32f4xx_it.o"
+"uart_comms_stm32\stm32f4xx_hal_msp.o"
+"uart_comms_stm32\stm32f4xx_hal_tim.o"
+"uart_comms_stm32\stm32f4xx_hal_tim_ex.o"
+"uart_comms_stm32\stm32f4xx_hal_uart.o"
+"uart_comms_stm32\stm32f4xx_hal_rcc.o"
+"uart_comms_stm32\stm32f4xx_hal_rcc_ex.o"
+"uart_comms_stm32\stm32f4xx_hal_flash.o"
+"uart_comms_stm32\stm32f4xx_hal_flash_ex.o"
+"uart_comms_stm32\stm32f4xx_hal_flash_ramfunc.o"
+"uart_comms_stm32\stm32f4xx_hal_gpio.o"
+"uart_comms_stm32\stm32f4xx_hal_dma_ex.o"
+"uart_comms_stm32\stm32f4xx_hal_dma.o"
+"uart_comms_stm32\stm32f4xx_hal_pwr.o"
+"uart_comms_stm32\stm32f4xx_hal_pwr_ex.o"
+"uart_comms_stm32\stm32f4xx_hal_cortex.o"
+"uart_comms_stm32\stm32f4xx_hal.o"
+"uart_comms_stm32\stm32f4xx_hal_exti.o"
+"uart_comms_stm32\system_stm32f4xx.o"
+--library_type=microlib --strict --scatter "UART_Comms_STM32\UART_Comms_STM32.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "UART_Comms_STM32.map" -o UART_Comms_STM32\UART_Comms_STM32.axf
