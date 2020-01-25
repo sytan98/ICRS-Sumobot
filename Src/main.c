@@ -20,8 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "i2c.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -33,8 +31,6 @@
 #include "infrared.h"
 #include "motor.h"
 #include <stdlib.h>
-#include "opticalflow.h"
-#include "compass.h"
 
 /* USER CODE END Includes */
 
@@ -65,7 +61,80 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint32_t CH3_Val1 = 0;
+uint32_t CH3_Val2 = 0;
+uint32_t CH3_Difference = 0;
+uint8_t CH3_Is_First_Captured = 0; //is the first value captured?
 
+uint32_t CH2_Val1 = 0;
+uint32_t CH2_Val2 = 0;
+uint32_t CH2_Difference = 0;
+uint8_t CH2_Is_First_Captured = 0; //is the first value captured?
+
+uint32_t CH1_Val1 = 0;
+uint32_t CH1_Val2 = 0;
+uint32_t CH1_Difference = 0;
+uint8_t CH1_Is_First_Captured = 0; //is the first value captured?
+
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    //Handles right toggle
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
+        if (CH1_Is_First_Captured == 0) {
+            CH1_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            CH1_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH1_Is_First_Captured == 1) {
+            CH1_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH1_Val2 > CH1_Val1) {
+                CH1_Difference = CH1_Val2 - CH1_Val1;
+            }
+            CH1_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+
+        }
+
+    }
+    //Handles right knob
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
+        if (CH2_Is_First_Captured == 0) {
+            CH2_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+            CH2_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH2_Is_First_Captured == 1) {
+            CH2_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH2_Val2 > CH2_Val1) {
+                CH2_Difference = CH2_Val2 - CH2_Val1;
+            }
+            CH2_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
+        }
+    }
+    //Handles left toggle
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
+        if (CH3_Is_First_Captured == 0) {
+            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            CH3_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH3_Is_First_Captured == 1) {
+            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH3_Val2 > CH3_Val1) {
+                CH3_Difference = CH3_Val2 - CH3_Val1;
+
+            }
+            CH3_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+
+        }
+
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -75,13 +144,13 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-    uint8_t hello[15] = "Hello World!\r\n";
-    uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
-    uint8_t txBuf[30];
+  uint8_t hello[15] = "Hello World!\r\n";
+  uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
+  uint8_t txBuf[30];
 
-    int16_t deltaX = 0, deltaY = 0;
-    int16_t *deltaXptr = &deltaX;
-    int16_t *deltaYptr = &deltaY;
+  int16_t deltaX = 0, deltaY = 0;
+  int16_t *deltaXptr = &deltaX;
+  int16_t *deltaYptr = &deltaY;
   /* USER CODE END 1 */
   
 
@@ -105,33 +174,60 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_USART2_UART_Init();
-  MX_I2C1_Init();
-  MX_SPI1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_TIM15_Init();
   /* USER CODE BEGIN 2 */
-    HAL_UART_Transmit(&huart2, hello, sizeof(hello), 5);
-    if(initPMW3901())
-        HAL_UART_Transmit(&huart2, OPFSuccess, sizeof(OPFSuccess), 5);
+  pwm_init();
+  printf("Helloworld\n");
 
-    HAL_Delay(1000);
-    compass_init();
-    HAL_Delay(1000);
+  //Reads for CH1 on rc receiver (right toggle)
+  HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
+  //Reads for CH6 on rc receiver (right knob)
+  HAL_TIM_IC_Start_IT(&htim15,TIM_CHANNEL_2);
+  //Reads for CH3 on rc receiver (left toggle)
+  HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
+
+  HAL_Delay(5000);
+  //Wait for instructions
+  while(CH2_Difference>1300 & CH2_Difference<2000){}
+  if (CH2_Difference > 2000){
+      //Go into control mode
+      while(1){
+          int right_toggle = (int)CH1_Difference;
+          int left_toggle = (int)CH3_Difference;
+          printf("Control mode\n");
+          printf("Right toggle Diff is %d\n", right_toggle);
+          printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+          printf("Left toggle is %d\n", left_toggle);
+          HAL_Delay(250);
+
+          float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
+          float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
+          moveSteering((int)speed, (int)steering);
+      }
+  } else {
+      //Go into auto mode
+      printf("Auto mode\n");
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
+        printf("Wow i'm moving by myself\n");
 
-        // TEST STUFF
-        struct mag_struct mag_values = read_mag_values(&hi2c1);
-        uint8_t transmitX[30];
-        uint8_t transmitY[30];
-//        float finalVal = atan2(mag_values.x, mag_values.y);
-        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
-        // as described on arduino library
-        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
-        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
-        print_f(transmitX);
-        print_f(transmitY);
+        // Compass TEST STUFF
+//        struct mag_struct mag_values = read_mag_values(&hi2c1);
+//        uint8_t transmitX[30];
+//        uint8_t transmitY[30];
+//        //float finalVal = atan2(mag_values.x, mag_values.y);
+//        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
+//        // as described on arduino library
+//        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
+//        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
+//        print_f(transmitX);
+//        print_f(transmitY);
 
 
         // TEST STUFF END
@@ -188,8 +284,6 @@ int main(void)
             }
             HAL_Delay(50);
         }
-
-
     }
 
     /* USER CODE END WHILE */
@@ -215,7 +309,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -225,16 +319,15 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_TIM1;
-  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
   PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {

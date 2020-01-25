@@ -52,21 +52,40 @@ void lineDetected(int n){
     // if line detected is SW
     if (n == 3) {
         // and enemy is behind us, rotate anti-clockwise
-        if ((enemyLocation == 5 || enemyLocation == 6) && distance < 5) {
-            moveTank(-75, 75);
-        } else { // actual line, so move forwards
-            moveTank(100, 90);
+        while (!HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
+                                 infrared2_gpio_Pin)) {
+            if ((enemyLocation == 5 || enemyLocation == 6) && distance < 5) {
+                uint8_t greenLEDMessage[] = "interrupt3, case 1\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(-75, 75);
+            } else { // actual line, so move forwards
+                uint8_t greenLEDMessage[] = "interrupt3, case 2\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(100, 90);
+            }
+            HAL_Delay(2000);
         }
     }
 
     // if line detected is NW
-    if (n == 4) {
+    if (n == 3) {
         // and enemy is in front of us, push NW
-        if ((enemyLocation == 7 || enemyLocation == 8) && distance < 5) {
-            moveTank(75, 100);
-        } else { // actual line, so move backwards
-            moveTank(-100, -90);
+        while (!HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
+                                 infrared2_gpio_Pin)) {
+            if ((enemyLocation == 7 || enemyLocation == 8) && distance < 5) {
+
+                uint8_t greenLEDMessage[] = "interrupt4, case 1\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(75, 100);
+            } else { // actual line, so move backwards
+                uint8_t greenLEDMessage[] = "interrupt4, case 2\r\n";
+                HAL_UART_Transmit(&huart2, greenLEDMessage,
+                                  sizeof(greenLEDMessage) - 1, 1000);
+                moveTank(-100, -90);
+            }
+            HAL_Delay(2000);
         }
     }
-
-}
