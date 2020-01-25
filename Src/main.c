@@ -27,10 +27,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "distance.h"
-#include "infrared.h"
-#include "motor.h"
 #include <stdlib.h>
+#include "distance.h"
+#include "motor.h"
+#include "init_tests.h"
 
 /* USER CODE END Includes */
 

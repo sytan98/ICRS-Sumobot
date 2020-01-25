@@ -6,10 +6,32 @@
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-
 float cachedDistance = 1000.0f;
 
-// TODO: use pointers or just create in main
+extern struct us_sensor ultrasoundsensor1 = {00, 0.0,
+                                             ultrasound_trigger_GPIO_Port,
+                                             ultrasound_trigger_Pin,
+                                             ultrasound1_echo_GPIO_Port,
+                                             ultrasound1_echo_Pin};
+
+extern struct us_sensor ultrasoundsensor2 = {00, 0.0,
+                                             ultrasound_trigger_GPIO_Port,
+                                             ultrasound_trigger_Pin,
+                                             ultrasound2_echo_GPIO_Port,
+                                             ultrasound2_echo_Pin};
+
+extern struct us_sensor ultrasoundsensor3 = {00, 0.0,
+                                             ultrasound_trigger_GPIO_Port,
+                                             ultrasound_trigger_Pin,
+                                             ultrasound3_echo_GPIO_Port,
+                                             ultrasound3_echo_Pin};
+
+extern struct us_sensor ultrasoundsensor4 = {00, 0.0,
+                                             ultrasound_trigger_GPIO_Port,
+                                             ultrasound_trigger_Pin,
+                                             ultrasound4_echo_GPIO_Port,
+                                             ultrasound4_echo_Pin};
+
 struct us_sensor createSensor(int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin){
     struct us_sensor sensor = {name, 0, Trig_Port, Trig_Pin, Echo_Port, Echo_Pin};
     return sensor;
@@ -54,25 +76,10 @@ struct us_sensor getClosestEnemies(){
     float sensor[8];
     const int INT_MAX = 10000;
 
-    struct us_sensor ultrasoundsensor1 = createSensor(00,
-                                                      ultrasound_trigger_GPIO_Port,
-                                                      ultrasound_trigger_Pin,
-                                                      ultrasound1_echo_GPIO_Port,
-                                                      ultrasound1_echo_Pin);
-
-    struct us_sensor ultrasoundsensor2 = createSensor(00,
-                                                      ultrasound_trigger_GPIO_Port,
-                                                      ultrasound_trigger_Pin,
-                                                      ultrasound2_echo_GPIO_Port,
-                                                      ultrasound2_echo_Pin);
-
-    sensor[0]= getDistance(ultrasoundsensor1);
-    sensor[1]= getDistance(ultrasoundsensor2);
-
-//	sensor[4]= getDistance(sensor5);
-//	sensor[5]= getDistance(sensor6);
-//	sensor[6]= getDistance(sensor7);
-//	sensor[7]= getDistance(sensor8);
+    sensor[0] = getDistance(ultrasoundsensor1);
+    sensor[1] = getDistance(ultrasoundsensor2);
+    sensor[2] = getDistance(ultrasoundsensor3);
+    sensor[3] = getDistance(ultrasoundsensor4);
 
     int dist1 = INT_MAX;
     int dist2 = INT_MAX;
