@@ -7,13 +7,7 @@
 // Util functions
 void error(int errorCode) {
     /* Error codes:
-     * 1 - Device is not ready
-     * 2 - Fail sanity check of fixed register
-     * 3 - Set gain fail
-     * 4 - Set frequency fail
-     * 5 - Set continuous read fail
-     * 10 - Failure to ask for mag readings
-     * 11 - Failure to receive mag readings
+     * 1 - Undefined
      */
     while (1) {
         u_int8_t errorMsg[12];
