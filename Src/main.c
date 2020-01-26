@@ -177,7 +177,6 @@ int main(void)
 //  run_tests();
   HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
   delayMicroseconds(2000);
-  printf("yolosawg");
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
@@ -213,16 +212,20 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        delayMicroseconds(1000000);
-        int dist = getDistance(1);
+        HAL_Delay(1000);
+        int dist1 = getDistance(1);
+        int dist2 = getDistance(2);
+        int dist3 = getDistance(3);
+        int dist4 = getDistance(4);
 
-        uint8_t str[13];
-        sprintf((char*)str, "dist: %05d\r\n", dist);
-        HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
+        printf("\ndist1: %03d\n", dist1);
+        printf("dist2: %03d\n", dist2);
+        printf("dist3: %03d\n", dist3);
+        printf("dist4: %03d\n", dist4);
 
         // TEST STUFF
-        printf("Wow i'm moving by myself\n");
-        HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
+//        printf("Wow i'm moving by myself\n");
+//        HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
 
         // TEST STUFF END
         /*

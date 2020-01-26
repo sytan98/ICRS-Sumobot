@@ -4,44 +4,36 @@
 
 #include "distance.h"
 
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-
-float cachedDistance = 1000.0f;
-
-struct us_sensor ultrasoundsensor1 = {00, 0.0,
+struct us_sensor ultrasoundsensor1 = {00, -1,
                                       ultrasound_trigger_GPIO_Port,
                                       ultrasound_trigger_Pin,
                                       ultrasound1_echo_GPIO_Port,
                                       ultrasound1_echo_Pin};
 
-struct us_sensor ultrasoundsensor2 = {00, 0.0,
+struct us_sensor ultrasoundsensor2 = {00, -1,
                                       ultrasound_trigger_GPIO_Port,
                                       ultrasound_trigger_Pin,
                                       ultrasound2_echo_GPIO_Port,
                                       ultrasound2_echo_Pin};
 
-struct us_sensor ultrasoundsensor3 = {00, 0.0,
+struct us_sensor ultrasoundsensor3 = {00, -1,
                                       ultrasound_trigger_GPIO_Port,
                                       ultrasound_trigger_Pin,
                                       ultrasound3_echo_GPIO_Port,
                                       ultrasound3_echo_Pin};
 
-struct us_sensor ultrasoundsensor4 = {00, 0.0,
+struct us_sensor ultrasoundsensor4 = {00, -1,
                                       ultrasound_trigger_GPIO_Port,
                                       ultrasound_trigger_Pin,
                                       ultrasound4_echo_GPIO_Port,
                                       ultrasound4_echo_Pin};
 
-struct us_sensor
-createSensor(int name, GPIO_TypeDef *Trig_Port, uint32_t Trig_Pin,
-             GPIO_TypeDef *Echo_Port, uint32_t Echo_Pin) {
-    struct us_sensor sensor = {name, 0, Trig_Port, Trig_Pin, Echo_Port,
-                               Echo_Pin};
-    return sensor;
-}
+// Used to check for timeout, notice this is reverse math to calculate dist
+static const int LOCAL_TIME_MAX = MAX_DISTANCE_IN_CM * 10 / 3 * 2 / 0.343;
 
 float getDistance(int ultrasoundChoose) {
 
+    float cachedDistance;
     struct us_sensor sensor;
     switch (ultrasoundChoose) {
         case 1 :
@@ -58,7 +50,7 @@ float getDistance(int ultrasoundChoose) {
             break;
     }
 
-    float local_time = 0;
+    int local_time = 0;
 
     // Reset pin
     HAL_GPIO_WritePin(sensor.Trig_Port, sensor.Trig_Pin,
@@ -73,73 +65,54 @@ float getDistance(int ultrasoundChoose) {
                       GPIO_PIN_RESET);  // pull the TRIG pin low
 
     // Read the time for which the pin is high
-    while (!(HAL_GPIO_ReadPin(sensor.Echo_Port,
-                              sensor.Echo_Pin)));  // wait for the ECHO pin to go high
+    // Wait for the pin to go high, if it doesn't within 1ms, skip measurement
+    int count = 0;
+    while (!(HAL_GPIO_ReadPin(sensor.Echo_Port, sensor.Echo_Pin))) {
+        if (count > 1000) {
+            return -1;
+        }
+        delayMicroseconds(1);
+        count++;
+    }
 
-    //TODO: what if there is no echo because nothing is detected
+    // Skip measurement and return -1, which is a sign something went wrong
+    if (!(HAL_GPIO_ReadPin(sensor.Echo_Port,
+                       sensor.Echo_Pin))) {
+        return -1;
+    }
+
+    // While pin high, start timer. Also, check for timeout condition
     while (HAL_GPIO_ReadPin(sensor.Echo_Port,
-                            sensor.Echo_Pin))    // while the pin is high
+                            sensor.Echo_Pin) && local_time < LOCAL_TIME_MAX)
     {
         local_time++;   // measure time for which the pin is high
         delayMicroseconds(1);
     }
 
-    cachedDistance = (local_time * .0343) / 2;
+    cachedDistance = (float) (local_time * .0343) / 2 * 3;
 
     return cachedDistance;
 }
 
 struct us_sensor getClosestEnemies() {
-    float sensor[8];
-    const int INT_MAX = 10000;
+    float sensor[4];
 
     sensor[0] = getDistance(1);
     sensor[1] = getDistance(2);
     sensor[2] = getDistance(3);
     sensor[3] = getDistance(4);
 
-    int dist1 = INT_MAX;
-    int dist2 = INT_MAX;
-    int sensor1 = 0;
-    int sensor2 = 0;
+    int min_dist = MAX_DISTANCE_IN_CM * 10;
+    int min_sensor = 0;
 
-    // TODO: what if 2 smallest distance sensors are not next to each other
-    for (int i = 0; i < 4; i++) {
-        if (sensor[i] < dist1) {
-            dist2 = dist1;
-            sensor2 = sensor1;
-            dist1 = sensor[i];
-            sensor1 = i + 1;
-        } else if (sensor[i] < dist2 && sensor[i] > dist1) {
-            dist2 = sensor[i];
-            sensor2 = i + 1;
-        }
-            // same value of distance
-        else if (sensor[i] < dist2 && sensor[i] == dist1) {
-            dist2 = sensor[i];
-            sensor2 = i + 1;
+    // Loops through to find closest enemy
+    for (int i=0; i<4; i++) {
+        if (sensor[i] < min_dist) {
+            min_dist = sensor[i];
+            min_sensor = i + 1;
         }
     }
 
-    int final_name;
-    // if nothing is detected
-    if (dist1 == dist2 && dist1 == 0) {
-        final_name = 0;
-    }
-        //reorganise the order of two sensors if they are not in the correct order
-    else if (sensor2 < sensor1) {
-        int tmp = sensor2;
-        sensor2 = sensor1;
-        sensor1 = tmp;
-
-//		final_name = sensor1 * 10 + sensor2;
-        final_name = sensor2;
-    } else {
-//		final_name = sensor1 * 10 + sensor2;
-        final_name = sensor1;
-    }
-
-    struct us_sensor result = {final_name, MIN(dist1, dist2), NULL, 0, NULL, 0};
-
+    struct us_sensor result = {min_sensor, min_dist, NULL, 0, NULL, 0};
     return result;
 }
