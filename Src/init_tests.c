@@ -11,8 +11,8 @@ void run_tests() {
 static void ultrasound_test() {
     printf("Starting ultrasound test\n");
 //     us1, us2, us3, us4
-    float f = getDistance(ultrasoundsensor1);
-    printf("distance: %02d", (int) f);
+    int f = getDistance(4);
+    printf("distance: %02d", f);
 
 //    float us_distances[4];
 //    us_distances[0] = 100;

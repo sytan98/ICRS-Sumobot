@@ -174,10 +174,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   DWT_Init();
   pwm_init();
-  timer_init();
 //  run_tests();
   HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
-  delay(2000);
+  delayMicroseconds(2000);
   printf("yolosawg");
 
   //Reads for CH1 on rc receiver (right toggle)
@@ -214,15 +213,11 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        struct us_sensor us1 = createSensor("ultrasound1",
-                                            ultrasound_trigger_GPIO_Port,
-                                            ultrasound_trigger_Pin,
-                                            ultrasound4_echo_GPIO_Port,
-                                            ultrasound4_echo_Pin);
-        int dist = getDistance(us1);
+        delayMicroseconds(1000000);
+        int dist = getDistance(1);
 
-        uint8_t str[7];
-        sprintf((char*)str, "%05d\r\n", dist);
+        uint8_t str[13];
+        sprintf((char*)str, "dist: %05d\r\n", dist);
         HAL_UART_Transmit(&huart2, str, sizeof(str), 100);
 
         // TEST STUFF
