@@ -179,7 +179,7 @@ int main(void)
 
     if (TESTING_MODE) {
         printf("ENTERING TESTING MODE\n\n");
-        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+//        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
         run_tests();
     }
 
