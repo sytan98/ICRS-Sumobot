@@ -6,8 +6,6 @@
 #include "infrared.h"
 #include "motor.h"
 
-#define ULTRASOUND_TEST_DISTANCE 10.0 //Distance in cm
-
 void run_tests();
 static void ultrasound_test();
 static void infrared_test();

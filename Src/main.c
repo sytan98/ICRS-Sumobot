@@ -41,6 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define TESTING_MODE 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -145,6 +146,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   uint8_t hello[15] = "Hello World!\n";
+  printf(hello);
   /* USER CODE END 1 */
   
 
@@ -174,9 +176,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   DWT_Init();
   pwm_init();
-//  run_tests();
-  HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
-  delayMicroseconds(2000);
+
+    if (TESTING_MODE) {
+        printf("ENTERING TESTING MODE\n\n");
+        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+        run_tests();
+    }
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
@@ -212,20 +217,29 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        HAL_Delay(1000);
-        int dist1 = getDistance(1);
-        int dist2 = getDistance(2);
-        int dist3 = getDistance(3);
-        int dist4 = getDistance(4);
-
-        printf("\ndist1: %03d\n", dist1);
-        printf("dist2: %03d\n", dist2);
-        printf("dist3: %03d\n", dist3);
-        printf("dist4: %03d\n", dist4);
 
         // TEST STUFF
-//        printf("Wow i'm moving by myself\n");
-//        HAL_UART_Transmit(&huart2, hello, sizeof(hello), 1000);
+        HAL_Delay(200);
+//        printf("knn");
+        int dist1 = getDistance(1);
+//        int dist2 = getDistance(2);
+//        int dist3 = getDistance(3);
+//        int dist4 = getDistance(4);
+
+        printf("\ndist1: %03d\n", dist1);
+//        printf("dist2: %03d\n", dist2);
+//        printf("dist3: %03d\n", dist3);
+//        printf("dist4: %03d\n", dist4);
+
+        if (dist1 < 10) {
+            moveTank(0,0);
+        } else if (dist1 < 20) {
+            moveTank(30,30);
+        } else if (dist1 < 30) {
+            moveTank(80, 80);
+        } else {
+            moveTank(100,100);
+        }
 
         // TEST STUFF END
         /*

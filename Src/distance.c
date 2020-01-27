@@ -32,6 +32,12 @@ struct us_sensor ultrasoundsensor4 = {00, -1,
 static const int LOCAL_TIME_MAX = MAX_DISTANCE_IN_CM * 10 / 3 * 2 / 0.343;
 
 float getDistance(int ultrasoundChoose) {
+    /* Returns distances in cm
+     * Error distance values:
+     * -1 : Invalid ultrasoundChoose variable entered (Must be from 1-4)
+     * -2 : Error in initialising trigger/echo sequence
+     * -3 : Distance returned more than MAX_DISTANCE_IN_CM
+     */
 
     float cachedDistance;
     struct us_sensor sensor;
@@ -48,6 +54,8 @@ float getDistance(int ultrasoundChoose) {
         case 4 :
             sensor = ultrasoundsensor4;
             break;
+        default :
+            return -1;
     }
 
     int local_time = 0;
@@ -69,28 +77,23 @@ float getDistance(int ultrasoundChoose) {
     int count = 0;
     while (!(HAL_GPIO_ReadPin(sensor.Echo_Port, sensor.Echo_Pin))) {
         if (count > 1000) {
-            return -1;
+            return -2;
         }
         delayMicroseconds(1);
         count++;
     }
 
-    // Skip measurement and return -1, which is a sign something went wrong
-    if (!(HAL_GPIO_ReadPin(sensor.Echo_Port,
-                       sensor.Echo_Pin))) {
-        return -1;
-    }
-
     // While pin high, start timer. Also, check for timeout condition
-    while (HAL_GPIO_ReadPin(sensor.Echo_Port,
-                            sensor.Echo_Pin) && local_time < LOCAL_TIME_MAX)
-    {
+    while (HAL_GPIO_ReadPin(sensor.Echo_Port, sensor.Echo_Pin)) {
+        if (local_time > LOCAL_TIME_MAX) {
+            return -3;
+        }
+
         local_time++;   // measure time for which the pin is high
         delayMicroseconds(1);
     }
 
     cachedDistance = (float) (local_time * .0343) / 2 * 3;
-
     return cachedDistance;
 }
 
