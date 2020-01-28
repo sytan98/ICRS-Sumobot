@@ -41,7 +41,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TESTING_MODE 1
+#define TESTING_MODE 0
+#define RIGHT_TOGGLE_MAX 1805
+#define RIGHT_TOGGLE_MIN 896
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,16 +54,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+// Variables used in remote control
 uint32_t CH3_Val1 = 0;
 uint32_t CH3_Val2 = 0;
 uint32_t CH3_Difference = 0;
@@ -76,66 +69,19 @@ uint32_t CH1_Val1 = 0;
 uint32_t CH1_Val2 = 0;
 uint32_t CH1_Difference = 0;
 uint8_t CH1_Is_First_Captured = 0; //is the first value captured?
+/* USER CODE END PV */
 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
+void isFilterMode();
+void torqueCheck();
+/* USER CODE END PFP */
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    //Handles right toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
-        if (CH1_Is_First_Captured == 0) {
-            CH1_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            CH1_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
-        } else if (CH1_Is_First_Captured == 1) {
-            CH1_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH1_Val2 > CH1_Val1) {
-                CH1_Difference = CH1_Val2 - CH1_Val1;
-            }
-            CH1_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-    //Handles right knob
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
-        if (CH2_Is_First_Captured == 0) {
-            CH2_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            CH2_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH2_Is_First_Captured == 1) {
-            CH2_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH2_Val2 > CH2_Val1) {
-                CH2_Difference = CH2_Val2 - CH2_Val1;
-            }
-            CH2_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
-        }
-    }
-    //Handles left toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
-        if (CH3_Is_First_Captured == 0) {
-            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-            CH3_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH3_Is_First_Captured == 1) {
-            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH3_Val2 > CH3_Val1) {
-                CH3_Difference = CH3_Val2 - CH3_Val1;
-
-            }
-            CH3_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-}
 /* USER CODE END 0 */
 
 /**
@@ -196,121 +142,56 @@ int main(void)
   if (CH2_Difference > 2000){
       //Go into control mode
       while(1){
-          int right_toggle = (int)CH1_Difference;
-          int left_toggle = (int)CH3_Difference;
-          printf("Control mode\n");
-          printf("Right toggle Diff is %d\n", right_toggle);
-          printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-          printf("Left toggle is %d\n", left_toggle);
-          HAL_Delay(250);
 
-          float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
-          float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
-          moveSteering((int)speed, (int)steering);
       }
   } else {
       //Go into auto mode
       printf("Auto mode\n");
   }
+  int BREAK_RC = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
         // TEST STUFF
-        HAL_Delay(1000);
-//        int dist1 = getDistance(1);
-//        int dist2 = getDistance(2);
-//        int dist3 = getDistance(3);
-//        int dist4 = getDistance(4);
-//        printf("\ndist1: %03d\n", dist1);
-//        printf("dist2: %03d\n", dist2);
-//        printf("dist3: %03d\n", dist3);
-//        printf("dist4: %03d\n", dist4);
-
-        int ir_booleans[4];
-        ir_booleans[0] = !HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
-                                           infrared1_gpio_Pin);
-        ir_booleans[1] = !HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
-                                           infrared2_gpio_Pin);
-        ir_booleans[2] = !HAL_GPIO_ReadPin(infrared3_gpio_GPIO_Port,
-                                           infrared3_gpio_Pin);
-        ir_booleans[3] = !HAL_GPIO_ReadPin(infrared4_gpio_GPIO_Port,
-                                           infrared4_gpio_Pin);
-
-        printf("\nInfrared 1 boolean: %01d\n", ir_booleans[0]);
-        printf("Infrared 2 boolean: %01d\n", ir_booleans[1]);
-        printf("Infrared 3 boolean: %01d\n", ir_booleans[2]);
-        printf("Infrared 4 boolean: %01d\n", ir_booleans[3]);
-
-//        if (dist1 < 10) {
-//            moveTank(0,0);
-//        } else if (dist1 < 20) {
-//            moveTank(30,30);
-//        } else if (dist1 < 30) {
-//            moveTank(80, 80);
-//        } else {
-//            moveTank(100,100);
-//        }
 
         // TEST STUFF END
-        /*
-        // Logic if enemy is detected
-        // Assume locateEnemy is defined in distance.c and returns an int corresponding to location of enemy
-        // 00 = Enemy not seen, 18 = Enemy between ultrasound 1 & 8, etc
-        struct us_sensor enemyLocation = getClosestEnemies();
-        if (enemyLocation.name == 0) {
-            moveTank(10, 10);
-            delayMicroseconds(50);
-            moveTank(0, 0);
-            continue;
-        } else {
-            switch (enemyLocation.name) {
-                case 1: //Enemy is NNE, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNE\r\n", 12 - 1, 1000);
-                    moveTank(100, 80);
-                    break;
-                case 2:
-                    // Enemy is NE, move more to the right
-                    HAL_UART_Transmit(&huart2, "moving ENE\r\n", 12 - 1, 1000);
-                    moveTank(100, 70);
-                    break;
-                case 3:
-                    // Enemy is ESE, turn right
-                    HAL_UART_Transmit(&huart2, "moving ESE\r\n", 12 - 1, 1000);
-                    moveTank(100, -50);
-                    break;
-                case 4:
-                    // Enemy is SSE, turn right faster
-                    HAL_UART_Transmit(&huart2, "moving SSE\r\n", 12 - 1, 1000);
-                    moveTank(100, -75);
-                    break;
-                case 5:
-                    // Enemy is SSW, turn left faster
-                    HAL_UART_Transmit(&huart2, "moving SSW\r\n", 12 - 1, 1000);
-                    moveTank(-75, 100);
-                    break;
-                case 6:
-                    // Enemy is WSW, turn left
-                    HAL_UART_Transmit(&huart2, "moving WSW\r\n", 12 - 1, 1000);
-                    moveTank(-50, 100);
-                    break;
-                case 7:
-                    // Enemy is NW, move more to the left
-                    HAL_UART_Transmit(&huart2, "moving WNW\r\n", 12 - 1, 1000);
-                    moveTank(70, 100);
-                    break;
-                case 8://Enemy is NNW, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNW\r\n", 12 - 1, 1000);
-                    moveTank(80, 100);
-                    break;
-            }
-            HAL_Delay(50);
 
+        // Waiting mode
+        while (CH2_Difference > RIGHT_TOGGLE_MIN + 100 &
+        CH2_Difference < RIGHT_TOGGLE_MAX - 100) {
+            printf("Waiting to start...\n");
+            HAL_Delay(500);
         }
-         */
-    }
 
+        // Control mode
+        while (CH2_Difference > RIGHT_TOGGLE_MAX - 100 && !BREAK_RC) {
+            int right_toggle = (int)CH1_Difference;
+            int left_toggle = (int)CH3_Difference;
+            printf("Control mode\n");
+            printf("Right toggle Diff is %d\n", right_toggle);
+            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+            printf("Left toggle is %d\n", left_toggle);
+            HAL_Delay(500);
+
+            float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
+            float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
+            moveSteering((int)speed, (int)steering);
+        }
+
+        // Auto mode
+        while (CH2_Difference < RIGHT_TOGGLE_MIN + 100) {
+            printf("Automode\n");
+
+            float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
+            if (tofData[0] > 0 && tofData[1] > 0) {
+                moveTank(100, 100); // Enemy is in front
+            }
+
+            HAL_Delay(500);
+        }
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -362,6 +243,64 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    //Handles right toggle
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
+        if (CH1_Is_First_Captured == 0) {
+            CH1_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            CH1_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH1_Is_First_Captured == 1) {
+            CH1_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH1_Val2 > CH1_Val1) {
+                CH1_Difference = CH1_Val2 - CH1_Val1;
+            }
+            CH1_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+
+        }
+
+    }
+    //Handles right knob
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
+        if (CH2_Is_First_Captured == 0) {
+            CH2_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+            CH2_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH2_Is_First_Captured == 1) {
+            CH2_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH2_Val2 > CH2_Val1) {
+                CH2_Difference = CH2_Val2 - CH2_Val1;
+            }
+            CH2_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
+        }
+    }
+    //Handles left toggle
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
+        if (CH3_Is_First_Captured == 0) {
+            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            CH3_Is_First_Captured = 1;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+
+        } else if (CH3_Is_First_Captured == 1) {
+            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            __HAL_TIM_SET_COUNTER(htim, 0);
+            if (CH3_Val2 > CH3_Val1) {
+                CH3_Difference = CH3_Val2 - CH3_Val1;
+
+            }
+            CH3_Is_First_Captured = 0;
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+
+        }
+
+    }
+}
 /* USER CODE END 4 */
 
 /**
