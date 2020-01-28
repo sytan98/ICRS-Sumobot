@@ -41,7 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TESTING_MODE 0
+#define TESTING_MODE 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -180,7 +180,6 @@ int main(void)
     if (TESTING_MODE) {
         printf("ENTERING TESTING MODE\n\n");
         __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
-        HAL_GPIO_WritePin(infrared3_GPIO_Port, infrared3_gpio_Pin, GPIO_PIN_RESET);
         run_tests();
     }
 
@@ -220,14 +219,29 @@ int main(void)
     while (1) {
         // TEST STUFF
         HAL_Delay(1000);
-        int dist1 = getDistance(1);
+//        int dist1 = getDistance(1);
 //        int dist2 = getDistance(2);
 //        int dist3 = getDistance(3);
 //        int dist4 = getDistance(4);
-        printf("\ndist1: %03d\n", dist1);
+//        printf("\ndist1: %03d\n", dist1);
 //        printf("dist2: %03d\n", dist2);
 //        printf("dist3: %03d\n", dist3);
 //        printf("dist4: %03d\n", dist4);
+
+        int ir_booleans[4];
+        ir_booleans[0] = !HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
+                                           infrared1_gpio_Pin);
+        ir_booleans[1] = !HAL_GPIO_ReadPin(infrared2_gpio_GPIO_Port,
+                                           infrared2_gpio_Pin);
+        ir_booleans[2] = !HAL_GPIO_ReadPin(infrared3_gpio_GPIO_Port,
+                                           infrared3_gpio_Pin);
+        ir_booleans[3] = !HAL_GPIO_ReadPin(infrared4_gpio_GPIO_Port,
+                                           infrared4_gpio_Pin);
+
+        printf("\nInfrared 1 boolean: %01d\n", ir_booleans[0]);
+        printf("Infrared 2 boolean: %01d\n", ir_booleans[1]);
+        printf("Infrared 3 boolean: %01d\n", ir_booleans[2]);
+        printf("Infrared 4 boolean: %01d\n", ir_booleans[3]);
 
 //        if (dist1 < 10) {
 //            moveTank(0,0);

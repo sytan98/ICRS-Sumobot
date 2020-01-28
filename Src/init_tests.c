@@ -18,23 +18,22 @@ static void ultrasound_test() {
     us_distances[2] = 100;
     us_distances[3] = 100;
     while (us_distances[0] > ULTRASOUND_TEST_DISTANCE ||
-//            us_distances[1] > ULTRASOUND_TEST_DISTANCE ||
-//            us_distances[2] > ULTRASOUND_TEST_DISTANCE ||
-//            us_distances[3] > ULTRASOUND_TEST_DISTANCE ||
-            us_distances[0] <= 0) {
-        //||
-//            us_distances[1] <= 0 ||
-//            us_distances[2] <= 0 ||
-//            us_distances[3] <= 0) {
+            us_distances[1] > ULTRASOUND_TEST_DISTANCE ||
+            us_distances[2] > ULTRASOUND_TEST_DISTANCE ||
+            us_distances[3] > ULTRASOUND_TEST_DISTANCE ||
+            us_distances[0] <= 0 ||
+            us_distances[1] <= 0 ||
+            us_distances[2] <= 0 ||
+            us_distances[3] <= 0) {
         us_distances[0] = getDistance(1);
-//        us_distances[1] = getDistance(2);
-//        us_distances[2] = getDistance(3);
-//        us_distances[3] = getDistance(4);
+        us_distances[1] = getDistance(2);
+        us_distances[2] = getDistance(3);
+        us_distances[3] = getDistance(4);
 
         printf("\nUltrasound 1 distance: %03d\n", (int) us_distances[0]);
-//        printf("Ultrasound 2 distance: %03d\n", (int) us_distances[1]);
-//        printf("Ultrasound 3 distance: %03d\n", (int) us_distances[2]);
-//        printf("Ultrasound 4 distance: %03d\n", (int) us_distances[3]);
+        printf("Ultrasound 2 distance: %03d\n", (int) us_distances[1]);
+        printf("Ultrasound 3 distance: %03d\n", (int) us_distances[2]);
+        printf("Ultrasound 4 distance: %03d\n", (int) us_distances[3]);
 
         HAL_Delay(500);
     }
@@ -44,7 +43,7 @@ static void ultrasound_test() {
 
 static void infrared_test() {
     printf("Starting infrared test\n");
-    int ir_booleans[4];
+    int ir_booleans[4] = {0, 0, 0, 0};
     while (!ir_booleans[0] || !ir_booleans[1]
         || !ir_booleans[2] || !ir_booleans[3]) {
         ir_booleans[0] = !HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
