@@ -76,7 +76,7 @@ float getDistance(int ultrasoundChoose) {
     // Wait for the pin to go high, if it doesn't within 1ms, skip measurement
     int count = 0;
     while (!(HAL_GPIO_ReadPin(sensor.Echo_Port, sensor.Echo_Pin))) {
-        if (count > 1000) {
+        if (count > 100000) {
             return -2;
         }
         delayMicroseconds(1);
@@ -88,7 +88,6 @@ float getDistance(int ultrasoundChoose) {
         if (local_time > LOCAL_TIME_MAX) {
             return -3;
         }
-
         local_time++;   // measure time for which the pin is high
         delayMicroseconds(1);
     }

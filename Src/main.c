@@ -41,7 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TESTING_MODE 1
+#define TESTING_MODE 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -179,7 +179,8 @@ int main(void)
 
     if (TESTING_MODE) {
         printf("ENTERING TESTING MODE\n\n");
-//        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+        HAL_GPIO_WritePin(infrared3_GPIO_Port, infrared3_gpio_Pin, GPIO_PIN_RESET);
         run_tests();
     }
 
@@ -217,29 +218,26 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-
         // TEST STUFF
-        HAL_Delay(200);
-//        printf("knn");
+        HAL_Delay(1000);
         int dist1 = getDistance(1);
 //        int dist2 = getDistance(2);
 //        int dist3 = getDistance(3);
 //        int dist4 = getDistance(4);
-
         printf("\ndist1: %03d\n", dist1);
 //        printf("dist2: %03d\n", dist2);
 //        printf("dist3: %03d\n", dist3);
 //        printf("dist4: %03d\n", dist4);
 
-        if (dist1 < 10) {
-            moveTank(0,0);
-        } else if (dist1 < 20) {
-            moveTank(30,30);
-        } else if (dist1 < 30) {
-            moveTank(80, 80);
-        } else {
-            moveTank(100,100);
-        }
+//        if (dist1 < 10) {
+//            moveTank(0,0);
+//        } else if (dist1 < 20) {
+//            moveTank(30,30);
+//        } else if (dist1 < 30) {
+//            moveTank(80, 80);
+//        } else {
+//            moveTank(100,100);
+//        }
 
         // TEST STUFF END
         /*
