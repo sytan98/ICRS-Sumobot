@@ -193,24 +193,24 @@ int main(void)
 
   HAL_Delay(2000);
   //Wait for instructions
-  while(CH2_Difference>1300 & CH2_Difference<2000){
+  while(CH2_Difference>1000 & CH2_Difference<1600){
       printf("ch2 middle\n");
       printf("ch2: %d\n", (int) CH2_Difference);
       HAL_Delay(500);
   }
-  if (CH2_Difference > 2000){
+  if (CH2_Difference > 1600){
       //Go into control mode
       while(1){
           int right_toggle = (int)CH1_Difference;
           int left_toggle = (int)CH3_Difference;
           printf("Control mode\n");
-          printf("Right toggle Diff is %d\n", right_toggle);
-          printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-          printf("Left toggle is %d\n", left_toggle);
-          HAL_Delay(250);
+          printf("Right toggle Diff is %d\n", (int) CH1_Difference);
+          printf("Right Knob Diff is %d\n", (int) CH2_Difference);
+          printf("Left toggle is %d\n", (int) CH3_Difference);
+          HAL_Delay(1000);
 
-          float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
-          float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
+          float steering = ((float)(right_toggle - 1024)/(float)(1711-1024)*200 -100);
+          float speed = ((float)(left_toggle - 1056)/(float)(1646-1056)*200 - 100);
           moveSteering((int)speed, (int)steering);
       }
   } else {
@@ -218,8 +218,6 @@ int main(void)
       printf("Auto mode\n");
   }
 
-  uint32_t toggle_min = 10000;
-    uint32_t toggle_max = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -227,15 +225,10 @@ int main(void)
     while (1) {
         // TEST STUFF
         HAL_Delay(1000);
-        if (CH2_Difference > toggle_max) {
-            toggle_max = CH2_Difference;
-        }
-        if (CH2_Difference < toggle_min) {
-            toggle_min = CH2_Difference;
-        }
         printf("ch2: %d\n", (int) CH2_Difference);
-        printf("min: %d\n", (int) toggle_min);
-        printf("max: %d\n", (int) toggle_max);
+        printf("ch1: %d\n", (int) CH1_Difference);
+        printf("ch3: %d\n", (int) CH3_Difference);
+
 //        int dist1 = getDistance(1);
 //        int dist2 = getDistance(2);
 //        int dist3 = getDistance(3);
