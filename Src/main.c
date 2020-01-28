@@ -186,14 +186,18 @@ int main(void)
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
-  //Reads for CH6 on rc receiver (right knob)
+  //Reads for CH5 on rc receiver (right knob)
   HAL_TIM_IC_Start_IT(&htim15,TIM_CHANNEL_2);
   //Reads for CH3 on rc receiver (left toggle)
   HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
 
   HAL_Delay(2000);
   //Wait for instructions
-//  while(CH2_Difference>1300 & CH2_Difference<2000){}
+  while(CH2_Difference>1300 & CH2_Difference<2000){
+      printf("ch2 middle\n");
+      printf("ch2: %d\n", (int) CH2_Difference);
+      HAL_Delay(500);
+  }
   if (CH2_Difference > 2000){
       //Go into control mode
       while(1){
@@ -213,6 +217,9 @@ int main(void)
       //Go into auto mode
       printf("Auto mode\n");
   }
+
+  uint32_t toggle_min = 10000;
+    uint32_t toggle_max = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -220,11 +227,20 @@ int main(void)
     while (1) {
         // TEST STUFF
         HAL_Delay(1000);
-        int dist1 = getDistance(1);
+        if (CH2_Difference > toggle_max) {
+            toggle_max = CH2_Difference;
+        }
+        if (CH2_Difference < toggle_min) {
+            toggle_min = CH2_Difference;
+        }
+        printf("ch2: %d\n", (int) CH2_Difference);
+        printf("min: %d\n", (int) toggle_min);
+        printf("max: %d\n", (int) toggle_max);
+//        int dist1 = getDistance(1);
 //        int dist2 = getDistance(2);
 //        int dist3 = getDistance(3);
 //        int dist4 = getDistance(4);
-        printf("\ndist1: %03d\n", dist1);
+//        printf("\ndist1: %03d\n", dist1);
 //        printf("dist2: %03d\n", dist2);
 //        printf("dist3: %03d\n", dist3);
 //        printf("dist4: %03d\n", dist4);
