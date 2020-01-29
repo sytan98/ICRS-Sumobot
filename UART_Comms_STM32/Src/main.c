@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "UARTLink.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,7 +98,7 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 	
-	uint8_t data[8];
+	uint8_t data[14];
 	uint8_t request[1]={'0'};
 	
 	HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,0);
@@ -109,13 +109,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		HAL_UART_Transmit(&huart1,request,1,1);
-		HAL_UART_Receive(&huart1,data,sizeof(data),1);
-		
-		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,1);
-		HAL_UART_Transmit(&huart6,data,sizeof(data),1);
-		//HAL_UART_Transmit(&huart6,request,sizeof(request),100);
-		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,0);
+//		HAL_UART_Transmit(&huart1,request,1,1);
+//		HAL_UART_Receive(&huart1,data,sizeof(data),1);
+//		
+//		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,1);
+//		HAL_UART_Transmit(&huart6,data,sizeof(data),1);
+//		//HAL_UART_Transmit(&huart6,request,sizeof(request),100);
+//		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,0);
+		pollUART(&huart1,data);
 		
 		HAL_Delay(500);
     /* USER CODE END WHILE */

@@ -1,7 +1,7 @@
 Dependencies for Project 'UART_Comms_STM32', Target 'UART_Comms_STM32': (DO NOT MODIFY !)
 CompilerVersion: 5060750::V5.06 update 6 (build 750)::ARMCC
 F (startup_stm32f410rx.s)(0x5E2C316B)(--cpu Cortex-M4.fp.sp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include--pd "__UVISION_VERSION SETA 529" --pd "_RTE_ SETA 1" --pd "STM32F410Rx SETA 1"--list startup_stm32f410rx.lst --xref -o uart_comms_stm32\startup_stm32f410rx.o --depend uart_comms_stm32\startup_stm32f410rx.d)
-F (../Src/main.c)(0x5E309AD1)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\main.o --omf_browse uart_comms_stm32\main.crf --depend uart_comms_stm32\main.d)
+F (../Src/main.c)(0x5E319B12)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\main.o --omf_browse uart_comms_stm32\main.crf --depend uart_comms_stm32\main.d)
 I (../Inc/main.h)(0x5E2C3168)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5DFAA9FC)
 I (../Inc/stm32f4xx_hal_conf.h)(0x5E2C3168)
@@ -31,6 +31,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x5DFAA9FC
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x5DFAA9FC)
+I (../Src/UARTLink.h)(0x5E31A599)
 F (../Src/stm32f4xx_it.c)(0x5E2C3168)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\stm32f4xx_it.o --omf_browse uart_comms_stm32\stm32f4xx_it.crf --depend uart_comms_stm32\stm32f4xx_it.d)
 I (../Inc/main.h)(0x5E2C3168)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5DFAA9FC)
@@ -92,8 +93,8 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x5DFAA9FC
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x5DFAA9FC)
-F (..\Src\UARTLink.c)(0x5E309D05)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\uartlink.o --omf_browse uart_comms_stm32\uartlink.crf --depend uart_comms_stm32\uartlink.d)
-I (..\Src\UARTLink.h)(0x5E309B2E)
+F (..\Src\UARTLink.c)(0x5E31A626)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\uartlink.o --omf_browse uart_comms_stm32\uartlink.crf --depend uart_comms_stm32\uartlink.d)
+I (..\Src\UARTLink.h)(0x5E31A599)
 I (../Inc/main.h)(0x5E2C3168)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5DFAA9FC)
 I (../Inc/stm32f4xx_hal_conf.h)(0x5E2C3168)
@@ -123,7 +124,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x5DFAA9FC
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x5DFAA9FC)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x5DFAA9FC)
-F (..\Src\UARTLink.h)(0x5E309B2E)()
+F (..\Src\UARTLink.h)(0x5E31A599)()
 F (../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c)(0x5DFAA9FC)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_UART_Comms_STM32-IC:\Users\Joshua\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include-IC:\Users\Joshua\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="529" -D_RTE_ -DSTM32F410Rx -DUSE_HAL_DRIVER -DSTM32F410Rx-o uart_comms_stm32\stm32f4xx_hal_tim.o --omf_browse uart_comms_stm32\stm32f4xx_hal_tim.crf --depend uart_comms_stm32\stm32f4xx_hal_tim.d)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5DFAA9FC)
 I (../Inc/stm32f4xx_hal_conf.h)(0x5E2C3168)
