@@ -58,17 +58,24 @@ void analogWrite(int channel, int speed){
 // 50/-50 turns with one wheel only
 
 void moveSteering(int speed, int steering){
-    if (steering > 0) {
+    if (speed > 100){
+        speed = 100;
+    } else if (speed<-100){
+        speed = -100;
+    }
+
+    if (steering > 40) {
         // steering > 0, turn right: Left motor stays unchanged, Right motor is scaled.
         moveLeftMotor(speed);
-        moveRightMotor(100 + (-2*speed));
-    }  else if (steering < 0) {
+        moveRightMotor(0);
+    }  else if (steering < -40) {
         // steering < 0, turn left: Right motor stays unchanged, Left motor is scaled.
         moveRightMotor(speed);
-        moveLeftMotor(100 + (2*speed));
+        moveLeftMotor(0);
     } else {
         // Steering is 0, move straight
         moveForward(speed); // doesn't matter if speed is negative, due to the definition of moveforward anyway.
+        printf("move forward");
     }
 }
 
@@ -100,11 +107,11 @@ void moveLeftMotor(int speed){
 
 void moveRightMotor(int speed){
     if(speed > 0){
-        analogWrite(2, speed);
-        analogWrite(3, 0);
-    } else if (speed <= 0) {
-        analogWrite(3, -1*speed);
         analogWrite(2, 0);
+        analogWrite(3, speed);
+    } else {
+        analogWrite(3, 0);
+        analogWrite(2, -1*speed);
     }
 }
 

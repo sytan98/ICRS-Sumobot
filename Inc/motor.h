@@ -4,6 +4,7 @@
 
 #include "main.h"
 #include "tim.h"
+#include <stdio.h>
 
 // define primitive functions
 void pwm_init(void);

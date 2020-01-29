@@ -127,8 +127,8 @@ int main(void)
   pwm_init();
 
     if (TESTING_MODE) {
-        printf("ENTERING TESTING MODE\n\n");
         __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+        printf("ENTERING TESTING MODE\n\n");
         run_tests();
         __set_BASEPRI(5 << 4); // Re-enables IR interrupts
     }
@@ -151,6 +151,16 @@ int main(void)
 
         // TEST STUFF END
 
+        // Controller turned off
+        while (CH2_Difference == 0) {
+            printf("Controller is off!\n");
+            printf("Right toggle Diff is %d\n", CH1_Difference);
+            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+            printf("Left toggle is %d\n", CH3_Difference);
+
+            HAL_Delay(500);
+        }
+
         // Waiting mode
         while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
         CH2_Difference < RIGHT_KNOB_MAX - 100) {
@@ -159,6 +169,7 @@ int main(void)
         }
 
         // Control mode
+        __set_BASEPRI(2 << 4);
         while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
             int right_toggle = (int)CH1_Difference;
                 int left_toggle = (int)CH3_Difference;
@@ -166,23 +177,35 @@ int main(void)
             printf("Right toggle Diff is %d\n", right_toggle);
             printf("Right Knob Diff is %d\n", (int)CH2_Difference);
             printf("Left toggle is %d\n", left_toggle);
-            HAL_Delay(500);
+//            HAL_Delay(500);
 
             float steering = (float)(right_toggle - RIGHT_TOGGLE_MIN) /
                     (float)(RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) * 200 - 100;
             float speed = (float)(left_toggle - LEFT_TOGGLE_MIN) /
                     (float)(LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 - 100;
-//            moveSteering((int)speed, (int)steering);
+//            printf("steering: %d\n", (int) steering);
+//            printf("speed: %d\n", (int) speed);
+//            moveSteering((int)speed, (int) steering);
         }
+        __set_BASEPRI(5 << 4);
 
         // Auto mode
         while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
             printf("Automode\n");
 
-            float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
-            if (tofData[0] > 0 && tofData[1] > 0) {
-                moveTank(100, 100); // Enemy is in front
-            }
+            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+
+            printf("name: %d\n", enemyLocation);
+            printf("dist: %d\n", (int) distance);
+
+//            moveTank(50,50);
+
+//            float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
+//            if (tofData[0] > 0 && tofData[1] > 0) {
+//                moveTank(100, 100); // Enemy is in front
+//            }
 
             HAL_Delay(500);
         }
