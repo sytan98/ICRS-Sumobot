@@ -207,10 +207,9 @@ void SysTick_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-    if(__HAL_GPIO_EXTI_GET_IT(infrared1_gpio_Pin)!=RESET){
-        __HAL_GPIO_EXTI_CLEAR_IT(infrared1_gpio_Pin);
+    if(__HAL_GPIO_EXTI_GET_IT(infrared1_Pin)!=RESET){
+        __HAL_GPIO_EXTI_CLEAR_IT(infrared1_Pin);
         lineDetected(1);
-
     }
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
@@ -225,10 +224,9 @@ void EXTI0_IRQHandler(void)
 void EXTI1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI1_IRQn 0 */
-    if(__HAL_GPIO_EXTI_GET_IT(infrared2_gpio_Pin)){
-        __HAL_GPIO_EXTI_CLEAR_IT(infrared2_gpio_Pin);
+    if(__HAL_GPIO_EXTI_GET_IT(infrared2_Pin)!=RESET){
+        __HAL_GPIO_EXTI_CLEAR_IT(infrared2_Pin);
         lineDetected(2);
-
     }
   /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
@@ -243,17 +241,16 @@ void EXTI1_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-    if(__HAL_GPIO_EXTI_GET_IT(infrared3_gpio_Pin)!=RESET){
-        __HAL_GPIO_EXTI_CLEAR_IT(infrared3_gpio_Pin);
+    if(__HAL_GPIO_EXTI_GET_IT(infrared3_Pin)!=RESET){
+        __HAL_GPIO_EXTI_CLEAR_IT(infrared3_Pin);
         lineDetected(3);
-
     }
 
-    if(__HAL_GPIO_EXTI_GET_IT(infrared4_gpio_Pin)!=RESET){
-        __HAL_GPIO_EXTI_CLEAR_IT(infrared4_gpio_Pin);
+    if(__HAL_GPIO_EXTI_GET_IT(infrared4_Pin)!=RESET){
+        __HAL_GPIO_EXTI_CLEAR_IT(infrared4_Pin);
         lineDetected(4);
-
     }
+
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
