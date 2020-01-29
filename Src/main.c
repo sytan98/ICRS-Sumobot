@@ -27,7 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include <stdlib.h>
 #include "distance.h"
 #include "motor.h"
 #include "init_tests.h"
@@ -42,8 +41,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define TESTING_MODE 0
-#define RIGHT_TOGGLE_MAX 1805
-#define RIGHT_TOGGLE_MIN 896
+#define RIGHT_KNOB_MAX 1805
+#define RIGHT_KNOB_MIN 896
+#define RIGHT_TOGGLE_MAX 1711
+#define RIGHT_TOGGLE_MIN 1024
+#define LEFT_TOGGLE_MAX 1646
+#define LEFT_TOGGLE_MIN 1056
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -127,27 +130,17 @@ int main(void)
         printf("ENTERING TESTING MODE\n\n");
         __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
         run_tests();
+        __set_BASEPRI(5 << 4); // Re-enables IR interrupts
     }
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
-  //Reads for CH6 on rc receiver (right knob)
+  //Reads for CH5 on rc receiver (right knob)
   HAL_TIM_IC_Start_IT(&htim15,TIM_CHANNEL_2);
   //Reads for CH3 on rc receiver (left toggle)
   HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
 
   HAL_Delay(2000);
-  //Wait for instructions
-//  while(CH2_Difference>1300 & CH2_Difference<2000){}
-  if (CH2_Difference > 2000){
-      //Go into control mode
-      while(1){
-
-      }
-  } else {
-      //Go into auto mode
-      printf("Auto mode\n");
-  }
   int BREAK_RC = 0;
   /* USER CODE END 2 */
 
@@ -159,29 +152,31 @@ int main(void)
         // TEST STUFF END
 
         // Waiting mode
-        while (CH2_Difference > RIGHT_TOGGLE_MIN + 100 &
-        CH2_Difference < RIGHT_TOGGLE_MAX - 100) {
+        while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
+        CH2_Difference < RIGHT_KNOB_MAX - 100) {
             printf("Waiting to start...\n");
             HAL_Delay(500);
         }
 
         // Control mode
-        while (CH2_Difference > RIGHT_TOGGLE_MAX - 100 && !BREAK_RC) {
+        while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
             int right_toggle = (int)CH1_Difference;
-            int left_toggle = (int)CH3_Difference;
-            printf("Control mode\n");
+                int left_toggle = (int)CH3_Difference;
+            printf("\nControl mode\n");
             printf("Right toggle Diff is %d\n", right_toggle);
             printf("Right Knob Diff is %d\n", (int)CH2_Difference);
             printf("Left toggle is %d\n", left_toggle);
             HAL_Delay(500);
 
-            float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
-            float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
-            moveSteering((int)speed, (int)steering);
+            float steering = (float)(right_toggle - RIGHT_TOGGLE_MIN) /
+                    (float)(RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) * 200 - 100;
+            float speed = (float)(left_toggle - LEFT_TOGGLE_MIN) /
+                    (float)(LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 - 100;
+//            moveSteering((int)speed, (int)steering);
         }
 
         // Auto mode
-        while (CH2_Difference < RIGHT_TOGGLE_MIN + 100) {
+        while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
             printf("Automode\n");
 
             float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
@@ -283,19 +278,19 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     //Handles left toggle
     if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
         if (CH3_Is_First_Captured == 0) {
-            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
             CH3_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_4, TIM_INPUTCHANNELPOLARITY_FALLING);
 
         } else if (CH3_Is_First_Captured == 1) {
-            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
+            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
             __HAL_TIM_SET_COUNTER(htim, 0);
             if (CH3_Val2 > CH3_Val1) {
                 CH3_Difference = CH3_Val2 - CH3_Val1;
 
             }
             CH3_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_4, TIM_INPUTCHANNELPOLARITY_RISING);
 
         }
 
