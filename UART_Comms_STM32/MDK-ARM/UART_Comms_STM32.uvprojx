@@ -390,9 +390,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>::CMSIS</GroupName>
-        </Group>
-        <Group>
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
@@ -409,6 +406,16 @@
               <FileName>stm32f4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32f4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>UARTLink.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\UARTLink.c</FilePath>
+            </File>
+            <File>
+              <FileName>UARTLink.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\UARTLink.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -506,6 +513,9 @@
               <FilePath>../Src/system_stm32f4xx.c</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>

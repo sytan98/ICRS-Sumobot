@@ -112,7 +112,6 @@ int main(void)
 		HAL_UART_Transmit(&huart1,request,1,1);
 		HAL_UART_Receive(&huart1,data,sizeof(data),1);
 		
-		
 		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,1);
 		HAL_UART_Transmit(&huart6,data,sizeof(data),1);
 		//HAL_UART_Transmit(&huart6,request,sizeof(request),100);

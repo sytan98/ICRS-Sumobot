@@ -3,6 +3,7 @@
 "uart_comms_stm32\main.o"
 "uart_comms_stm32\stm32f4xx_it.o"
 "uart_comms_stm32\stm32f4xx_hal_msp.o"
+"uart_comms_stm32\uartlink.o"
 "uart_comms_stm32\stm32f4xx_hal_tim.o"
 "uart_comms_stm32\stm32f4xx_hal_tim_ex.o"
 "uart_comms_stm32\stm32f4xx_hal_uart.o"
