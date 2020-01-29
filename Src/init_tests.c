@@ -64,6 +64,68 @@ static void infrared_test() {
 }
 
 static void motor_test() {
+    printf("Starting motor test\n");
+    printf("If test is successful, trigger infrared1 to move on to next test\n");
+
+    printf("Move left motor full speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveLeftMotor(100);}
+    printf("Test passed!\n");
+
+    printf("Move left motor backward full speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveLeftMotor(-100);}
+    printf("Test passed!\n");
+
+    printf("Move right motor full speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveRightMotor(100);}
+    printf("Test passed!\n");
+
+    printf("Move right motor backward full speed\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveRightMotor(-100);}
+    printf("Test passed!\n");
+
+    printf("Move backwards full speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveBackwards(100);}
+    printf("Test passed!\n");
+
+    printf("Move backwards 50% speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveBackwards(50);}
+    printf("Test passed!\n");
+
+    printf("Move forwards full speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveForward(100);}
+    printf("Test passed!\n");
+
+    printf("Move forwards 50% speed:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveForward(50);}
+    printf("Test passed!\n");
+
+    printf("Move tank function: 75% left, 25% right:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveTank(75, 25);}
+    printf("Test passed!\n");
+
+    printf("Move tank function: 25% left, 75% right:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveTank(25, 75);}
+    printf("Test passed!\n");
+
+    printf("Steering - turn right:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveSteering(100, 100);}
+    printf("Test passed!\n");
+
+    printf("Steering - turn right one wheel:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveSteering(10, 40);}
+    printf("Test passed!\n");
+
+    printf("Steering - turn left:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveSteering(100, -100);}
+    printf("Test passed!\n");
+
+    printf("Steering - turn left one wheel:\n");
+    while (!HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port, infrared1_gpio_Pin)) {moveSteering(100, -40);}
+    printf("Test passed!\n");
+
+    printf("SUCCESS\n");
+    printf("End of motor test\n");
+
 
 }
 
