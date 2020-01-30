@@ -69,9 +69,6 @@ void Error_Handler(void);
 #define ultrasound_trigger_GPIO_Port GPIOA
 #define infrared3_gpio_Pin GPIO_PIN_5
 #define infrared3_gpio_GPIO_Port GPIOA
-#define infrared4_Pin GPIO_PIN_6
-#define infrared4_GPIO_Port GPIOA
-#define infrared4_EXTI_IRQn EXTI9_5_IRQn
 #define infrared2_gpio_Pin GPIO_PIN_7
 #define infrared2_gpio_GPIO_Port GPIOA
 #define infrared1_Pin GPIO_PIN_0
@@ -89,11 +86,7 @@ void Error_Handler(void);
 #define ultrasound1_echo_GPIO_Port GPIOA
 #define infrared1_gpio_Pin GPIO_PIN_3
 #define infrared1_gpio_GPIO_Port GPIOB
-#define ultrasound4_echo_Pin GPIO_PIN_5
-#define ultrasound4_echo_GPIO_Port GPIOB
-#define infrared4_gpio_Pin GPIO_PIN_6
-#define infrared4_gpio_GPIO_Port GPIOB
-#define infrared3_Pin GPIO_PIN_7
+#define infrared3_Pin GPIO_PIN_5
 #define infrared3_GPIO_Port GPIOB
 #define infrared3_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
