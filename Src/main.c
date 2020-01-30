@@ -30,6 +30,7 @@
 #include "distance.h"
 #include "motor.h"
 #include "init_tests.h"
+#include "remoteControl.h"
 
 /* USER CODE END Includes */
 
@@ -40,12 +41,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define RIGHT_KNOB_MAX 1805
-#define RIGHT_KNOB_MIN 896
-#define RIGHT_TOGGLE_MAX 1711
-#define RIGHT_TOGGLE_MIN 1024
-#define LEFT_TOGGLE_MAX 1646
-#define LEFT_TOGGLE_MIN 1056
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,21 +53,6 @@
 /* USER CODE BEGIN PV */
 // Variables used in remote control
 extern int TESTING_MODE = 0;
-
-uint32_t CH3_Val1 = 0;
-uint32_t CH3_Val2 = 0;
-uint32_t CH3_Difference = 0;
-uint8_t CH3_Is_First_Captured = 0; //is the first value captured?
-
-uint32_t CH2_Val1 = 0;
-uint32_t CH2_Val2 = 0;
-uint32_t CH2_Difference = 0;
-uint8_t CH2_Is_First_Captured = 0; //is the first value captured?
-
-uint32_t CH1_Val1 = 0;
-uint32_t CH1_Val2 = 0;
-uint32_t CH1_Difference = 0;
-uint8_t CH1_Is_First_Captured = 0; //is the first value captured?
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,7 +78,6 @@ int main(void)
   uint8_t hello[15] = "Hello World!\n";
   printf(hello);
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -126,6 +105,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   DWT_Init();
   pwm_init();
+  remoteControl_init();
 
     if (TESTING_MODE) {
         __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
@@ -133,13 +113,6 @@ int main(void)
         run_tests();
         __set_BASEPRI(5 << 4); // Re-enables IR interrupts
     }
-
-  //Reads for CH1 on rc receiver (right toggle)
-  HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
-  //Reads for CH5 on rc receiver (right knob)
-  HAL_TIM_IC_Start_IT(&htim15,TIM_CHANNEL_2);
-  //Reads for CH3 on rc receiver (left toggle)
-  HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
 
   HAL_Delay(2000);
   int BREAK_RC = 0;
@@ -297,65 +270,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    //Handles right toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
-        if (CH1_Is_First_Captured == 0) {
-            CH1_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            CH1_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH1_Is_First_Captured == 1) {
-            CH1_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH1_Val2 > CH1_Val1) {
-                CH1_Difference = CH1_Val2 - CH1_Val1;
-            }
-            CH1_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-    //Handles right knob
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
-        if (CH2_Is_First_Captured == 0) {
-            CH2_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            CH2_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH2_Is_First_Captured == 1) {
-            CH2_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH2_Val2 > CH2_Val1) {
-                CH2_Difference = CH2_Val2 - CH2_Val1;
-            }
-            CH2_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
-        }
-    }
-    //Handles left toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
-        if (CH3_Is_First_Captured == 0) {
-            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-            CH3_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_4, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH3_Is_First_Captured == 1) {
-            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH3_Val2 > CH3_Val1) {
-                CH3_Difference = CH3_Val2 - CH3_Val1;
-
-            }
-            CH3_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_4, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-}
 /* USER CODE END 4 */
 
 /**
