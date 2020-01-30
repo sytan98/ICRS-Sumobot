@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "gpio.h"
 #include "utils.h"
+#include "main.h"
 #define MAX_DISTANCE_IN_CM 200
 
 struct us_sensor{
@@ -16,8 +17,8 @@ struct us_sensor{
     uint32_t Echo_Pin;
 };
 
-float getDistance(int ultrasoundChoose);
+float getDistance(int sensorChoose);
 
-struct us_sensor getClosestEnemies(int tof1, int tof2);
+struct us_sensor getClosestEnemies();
 
 #endif

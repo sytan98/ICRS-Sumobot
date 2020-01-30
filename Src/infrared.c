@@ -8,11 +8,13 @@ void lineDetected(int n) {
     if (n == 1) {
         while (HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
                                  infrared1_gpio_Pin)) {
-            // and enemy is NE, BAMBOOZLED! so continue NE
-//            struct us_sensor us1 = getClosestEnemies();
-            int enemyLocation = 1;
-            float distance = 1;
-            if (enemyLocation == 1 && distance < THRESHOLD_DISTANCE) {
+            // and enemy is somewhere in front, where anyone of our 3 front
+            // sensors can detect it, BAMBOOZLED! so continue NE
+            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+            if ((enemyLocation == 4 || enemyLocation == 5 ||
+                enemyLocation == 1) && distance < THRESHOLD_DISTANCE) {
                 printf("interrupt 1, case 1\n");
                 moveTank(100, 75);
             } else { // actual line, so move backwards
@@ -37,10 +39,11 @@ void lineDetected(int n) {
         // and enemy is in front of us, push NW
         while (HAL_GPIO_ReadPin(infrared3_gpio_GPIO_Port,
                                  infrared3_gpio_Pin)) {
-//            struct us_sensor us1 = getClosestEnemies();
-            int enemyLocation = 1;
-            float distance = 1;
-            if (enemyLocation == 1 && distance < THRESHOLD_DISTANCE) {
+            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+            if ((enemyLocation == 4 || enemyLocation == 5 ||
+                enemyLocation == 1) && distance < THRESHOLD_DISTANCE) {
                 printf("interrupt 3, case 1\n");
                 moveTank(75, 100);
             } else { // actual line, so move backwards
