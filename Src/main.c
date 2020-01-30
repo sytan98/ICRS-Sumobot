@@ -217,7 +217,7 @@ int main(void)
 //            pollUART(&huart1,data);
 //            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
 
-            struct us_sensor us1 = getClosestEnemies(tof1, tof2);
+            struct us_sensor us1 = getClosestEnemies();
             int enemyLocation = us1.name;
             float distance = us1.distance;
 
