@@ -147,6 +147,8 @@ int main(void)
   int BREAK_RC = 0;
   int INITIAL_MOVEMENT = 0;
   uint8_t data[14];
+  uint8_t request[1]={'0'};
+  int8_t packet;
   int32_t power;
   int16_t heading;
   int16_t deltaX;
@@ -168,103 +170,101 @@ int main(void)
         printf("\n");
         printf("time of flight 1 is %d\n",tof1);
         printf("time of flight 2 is %d\n",tof2);
-        printf("x is %d\n",deltaX);
-        printf("y is %d\n",deltaY);
         HAL_Delay(500);
         // TEST STUFF END
 
-//        // Controller turned off
-//        __set_BASEPRI(2 << 4);
-//        while (CH2_Difference == 0) {
-//            printf("Controller is off!\n");
-//            printf("Right toggle Diff is %d\n", CH1_Difference);
-//            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-//            printf("Left toggle is %d\n", CH3_Difference);
-//            moveTank(0,0);
-//            HAL_Delay(500);
-//        }
-//
-//        // Waiting mode
-//        while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
-//        CH2_Difference < RIGHT_KNOB_MAX - 100) {
-//            printf("Waiting to start...\n");
-//            int INITIAL_MOVEMENT = 0;
-//            moveTank(0,0);
-//            HAL_Delay(500);
-//        }
-//
-//        // Control mode
-//        while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
-//            int right_toggle = (int)CH1_Difference;
-//                int left_toggle = (int)CH3_Difference;
-//            printf("\nControl mode\n");
-//            printf("Right toggle Diff is %d\n", right_toggle);
-//            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-//            printf("Left toggle is %d\n", left_toggle);
-//            HAL_Delay(5);
-//
-//            float steering = (float)(right_toggle - RIGHT_TOGGLE_MIN) /
-//                    (float)(RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) * 200 - 100;
-//            float speed = (float)(left_toggle - LEFT_TOGGLE_MIN) /
-//                    (float)(LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 - 100;
-//            printf("steering: %d\n", (int) steering);
-//            printf("speed: %d\n", (int) speed);
-//            moveSteering((int)speed, (int) steering);
-//
-//        }
-//        __set_BASEPRI(5 << 4);
-//
-//        // Auto mode
-//        while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
-//            printf("Automode\n");
-//
-//            if (!INITIAL_MOVEMENT) {
-//                moveTank(-60, -100);
-//                HAL_Delay(400);
-//                INITIAL_MOVEMENT = 1;
-//                moveTank(0,0);
-//                HAL_Delay(2000);
-//            }
-//
-//            int dist1 = getDistance(1);
-//            int dist2 = getDistance(2);
-//            int dist3 = getDistance(3);
-//            int dist4 = getDistance(4);
-//
-//            printf("dist1: %03d\n", dist1);
-//            printf("dist2: %03d\n", dist2);
-//            printf("dist3: %03d\n", dist3);
-//            printf("dist4: %03d\n", dist4);
-//
-////            pollUART(&huart1,data);
-////            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
-//
-//            struct us_sensor us1 = getClosestEnemies(tof1, tof2);
-//            int enemyLocation = us1.name;
-//            float distance = us1.distance;
-//
-//            printf("name: %d\n", enemyLocation);
-//            printf("dist: %d\n", (int) distance);
-//
-//            switch (enemyLocation) {
-//                case 1:
-//                    moveTank(100, 100);
-//                    break;
-//                case 2:
-//                    moveTank(60, -60);
-//                    break;
-//                case 3:
-//                    moveTank(-60, 60);
-//                    break;
-//                case 4:
-//                    moveTank(80, 100);
-//                    break;
-//                case 5:
-//                    moveTank(100, 80);
-//                    break;
-//            }
-//
-//            HAL_Delay(500);
+        // Controller turned off
+        __set_BASEPRI(2 << 4);
+        while (CH2_Difference == 0) {
+            printf("Controller is off!\n");
+            printf("Right toggle Diff is %d\n", CH1_Difference);
+            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+            printf("Left toggle is %d\n", CH3_Difference);
+            moveTank(0,0);
+            HAL_Delay(500);
+        }
+
+        // Waiting mode
+        while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
+        CH2_Difference < RIGHT_KNOB_MAX - 100) {
+            printf("Waiting to start...\n");
+            int INITIAL_MOVEMENT = 0;
+            moveTank(0,0);
+            HAL_Delay(500);
+        }
+
+        // Control mode
+        while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
+            int right_toggle = (int)CH1_Difference;
+                int left_toggle = (int)CH3_Difference;
+            printf("\nControl mode\n");
+            printf("Right toggle Diff is %d\n", right_toggle);
+            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+            printf("Left toggle is %d\n", left_toggle);
+            HAL_Delay(5);
+
+            float steering = (float)(right_toggle - RIGHT_TOGGLE_MIN) /
+                    (float)(RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) * 200 - 100;
+            float speed = (float)(left_toggle - LEFT_TOGGLE_MIN) /
+                    (float)(LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 - 100;
+            printf("steering: %d\n", (int) steering);
+            printf("speed: %d\n", (int) speed);
+            moveSteering((int)speed, (int) steering);
+
+        }
+        __set_BASEPRI(5 << 4);
+
+        // Auto mode
+        while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
+            printf("Automode\n");
+
+            if (!INITIAL_MOVEMENT) {
+                moveTank(-60, -100);
+                HAL_Delay(400);
+                INITIAL_MOVEMENT = 1;
+                moveTank(0,0);
+                HAL_Delay(2000);
+            }
+
+            int dist1 = getDistance(1);
+            int dist2 = getDistance(2);
+            int dist3 = getDistance(3);
+            int dist4 = getDistance(4);
+
+            printf("dist1: %03d\n", dist1);
+            printf("dist2: %03d\n", dist2);
+            printf("dist3: %03d\n", dist3);
+            printf("dist4: %03d\n", dist4);
+
+//            pollUART(&huart1,data);
+//            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+
+            struct us_sensor us1 = getClosestEnemies(tof1, tof2);
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+
+            printf("name: %d\n", enemyLocation);
+            printf("dist: %d\n", (int) distance);
+
+            switch (enemyLocation) {
+                case 1:
+                    moveTank(100, 100);
+                    break;
+                case 2:
+                    moveTank(60, -60);
+                    break;
+                case 3:
+                    moveTank(-60, 60);
+                    break;
+                case 4:
+                    moveTank(80, 100);
+                    break;
+                case 5:
+                    moveTank(100, 80);
+                    break;
+            }
+
+            HAL_Delay(500);
 
 
 //        }
