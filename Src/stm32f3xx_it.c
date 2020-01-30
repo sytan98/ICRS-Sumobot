@@ -245,15 +245,8 @@ void EXTI9_5_IRQHandler(void)
         __HAL_GPIO_EXTI_CLEAR_IT(infrared3_Pin);
         lineDetected(3);
     }
-
-    if(__HAL_GPIO_EXTI_GET_IT(infrared4_Pin)!=RESET){
-        __HAL_GPIO_EXTI_CLEAR_IT(infrared4_Pin);
-        lineDetected(4);
-    }
-
   /* USER CODE END EXTI9_5_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
   /* USER CODE END EXTI9_5_IRQn 1 */
