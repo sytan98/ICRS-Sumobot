@@ -117,7 +117,6 @@ int main(void)
     }
 
   HAL_Delay(2000);
-  int BREAK_RC = 0;
   int INITIAL_MOVEMENT = 0;
   uint8_t data[14];
   uint8_t request[1]={'0'};
@@ -134,15 +133,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1) {
         // TEST STUFF
-        printf("Hi\n");
-        pollUART(&huart1,data);
-        parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
-        for (int i = 0 ; i < 14; i++){
-            printf("%d ", data[i]);
-        }
-        printf("\n");
-        printf("time of flight 1 is %d\n",tof1);
-        printf("time of flight 2 is %d\n",tof2);
+//        printf("Hi\n");
+//        pollUART(&huart1,data);
+//        parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+//        for (int i = 0 ; i < 14; i++){
+//            printf("%d ", data[i]);
+//        }
+//        printf("\n");
+//        printf("time of flight 1 is %d\n",tof1);
+//        printf("time of flight 2 is %d\n",tof2);
         HAL_Delay(500);
         // TEST STUFF END
 

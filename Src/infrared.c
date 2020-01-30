@@ -9,9 +9,9 @@ void lineDetected(int n) {
         while (HAL_GPIO_ReadPin(infrared1_gpio_GPIO_Port,
                                  infrared1_gpio_Pin)) {
             // and enemy is NE, BAMBOOZLED! so continue NE
-            struct us_sensor us1 = getClosestEnemies();
-            int enemyLocation = us1.name;
-            float distance = us1.distance;
+//            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = 1;
+            float distance = 1;
             if (enemyLocation == 1 && distance < THRESHOLD_DISTANCE) {
                 printf("interrupt 1, case 1\n");
                 moveTank(100, 75);
@@ -37,9 +37,9 @@ void lineDetected(int n) {
         // and enemy is in front of us, push NW
         while (HAL_GPIO_ReadPin(infrared3_gpio_GPIO_Port,
                                  infrared3_gpio_Pin)) {
-            struct us_sensor us1 = getClosestEnemies();
-            int enemyLocation = us1.name;
-            float distance = us1.distance;
+//            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = 1;
+            float distance = 1;
             if (enemyLocation == 1 && distance < THRESHOLD_DISTANCE) {
                 printf("interrupt 3, case 1\n");
                 moveTank(75, 100);
