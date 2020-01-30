@@ -28,9 +28,10 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "distance.h"
-#include "infrared.h"
 #include "motor.h"
-#include <stdlib.h>
+#include "init_tests.h"
+#include "UARTlink.h"
+#include "remoteControl.h"
 
 /* USER CODE END Includes */
 
@@ -51,90 +52,32 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// Variables used in remote control
+int TESTING_MODE = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 
+void isFilterMode();
+
+void torqueCheck();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint32_t CH3_Val1 = 0;
-uint32_t CH3_Val2 = 0;
-uint32_t CH3_Difference = 0;
-uint8_t CH3_Is_First_Captured = 0; //is the first value captured?
-
-uint32_t CH2_Val1 = 0;
-uint32_t CH2_Val2 = 0;
-uint32_t CH2_Difference = 0;
-uint8_t CH2_Is_First_Captured = 0; //is the first value captured?
-
-uint32_t CH1_Val1 = 0;
-uint32_t CH1_Val2 = 0;
-uint32_t CH1_Difference = 0;
-uint8_t CH1_Is_First_Captured = 0; //is the first value captured?
-
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    //Handles right toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
-        if (CH1_Is_First_Captured == 0) {
-            CH1_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            CH1_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH1_Is_First_Captured == 1) {
-            CH1_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH1_Val2 > CH1_Val1) {
-                CH1_Difference = CH1_Val2 - CH1_Val1;
-            }
-            CH1_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-    //Handles right knob
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) {
-        if (CH2_Is_First_Captured == 0) {
-            CH2_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            CH2_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH2_Is_First_Captured == 1) {
-            CH2_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH2_Val2 > CH2_Val1) {
-                CH2_Difference = CH2_Val2 - CH2_Val1;
-            }
-            CH2_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
-        }
-    }
-    //Handles left toggle
-    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) {
-        if (CH3_Is_First_Captured == 0) {
-            CH3_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-            CH3_Is_First_Captured = 1;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_FALLING);
-
-        } else if (CH3_Is_First_Captured == 1) {
-            CH3_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-            __HAL_TIM_SET_COUNTER(htim, 0);
-            if (CH3_Val2 > CH3_Val1) {
-                CH3_Difference = CH3_Val2 - CH3_Val1;
-
-            }
-            CH3_Is_First_Captured = 0;
-            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_3, TIM_INPUTCHANNELPOLARITY_RISING);
-
-        }
-
-    }
-}
+int INITIAL_MOVEMENT = 0;
+uint8_t data[14];
+uint8_t request[1] = {'0'};
+int8_t packet;
+int32_t power;
+int16_t heading;
+int16_t deltaX;
+int16_t deltaY;
+int16_t tof1;
+int16_t tof2;
 /* USER CODE END 0 */
 
 /**
@@ -144,13 +87,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  uint8_t hello[15] = "Hello World!\r\n";
-  uint8_t OPFSuccess[30] = "Optical Flow Setup Success!\r\n";
-  uint8_t txBuf[30];
-
-  int16_t deltaX = 0, deltaY = 0;
-  int16_t *deltaXptr = &deltaX;
-  int16_t *deltaYptr = &deltaY;
+    uint8_t hello[15] = "Hello World!\n";
+    printf(hello);
   /* USER CODE END 1 */
   
 
@@ -177,115 +115,136 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM15_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  pwm_init();
-  printf("Helloworld\n");
+    DWT_Init();
+    pwm_init();
+    remoteControl_init();
 
-  //Reads for CH1 on rc receiver (right toggle)
-  HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
-  //Reads for CH6 on rc receiver (right knob)
-  HAL_TIM_IC_Start_IT(&htim15,TIM_CHANNEL_2);
-  //Reads for CH3 on rc receiver (left toggle)
-  HAL_TIM_IC_Start_IT(&htim3,TIM_CHANNEL_4);
+    if (TESTING_MODE) {
+        __set_BASEPRI(
+                2 << 4); // Disables all interrupts with priority 2 or lower
+        printf("ENTERING TESTING MODE\n\n");
+        run_tests();
+        __set_BASEPRI(5 << 4); // Re-enables IR interrupts
+        HAL_Delay(2000);
+    }
 
-  HAL_Delay(5000);
-  //Wait for instructions
-  while(CH2_Difference>1300 & CH2_Difference<2000){}
-  if (CH2_Difference > 2000){
-      //Go into control mode
-      while(1){
-          int right_toggle = (int)CH1_Difference;
-          int left_toggle = (int)CH3_Difference;
-          printf("Control mode\n");
-          printf("Right toggle Diff is %d\n", right_toggle);
-          printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-          printf("Left toggle is %d\n", left_toggle);
-          HAL_Delay(250);
-
-          float steering = ((float)(right_toggle - 1344)/(float)(2252-1344)*200 -100);
-          float speed = ((float)(left_toggle - 1405)/(float)(2185-1405)*200 - 100);
-          moveSteering((int)speed, (int)steering);
-      }
-  } else {
-      //Go into auto mode
-      printf("Auto mode\n");
-  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        printf("Wow i'm moving by myself\n");
-
-        // Compass TEST STUFF
-//        struct mag_struct mag_values = read_mag_values(&hi2c1);
-//        uint8_t transmitX[30];
-//        uint8_t transmitY[30];
-//        //float finalVal = atan2(mag_values.x, mag_values.y);
-//        // TODO: Need to calibrate compass readings, maybe using idea of max and min value
-//        // as described on arduino library
-//        sprintf((char *) transmitX, "x reading is %05d\r\n", (int) mag_values.x);
-//        sprintf((char *) transmitY, "y reading is %05d\r\n\n", (int) mag_values.y);
-//        print_f(transmitX);
-//        print_f(transmitY);
-
-
+        // TEST STUFF
+        printf("Hi\n");
+        pollUART(&huart1, data);
+        parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+        for (int i = 0; i < 14; i++) {
+            printf("%d ", data[i]);
+        }
+        printf("\n");
+        printf("time of flight 1 is %d\n", tof1);
+        printf("time of flight 2 is %d\n", tof2);
+        HAL_Delay(500);
         // TEST STUFF END
 
-        // Logic if enemy is detected
-        // Assume locateEnemy is defined in distance.c and returns an int corresponding to location of enemy
-        // 00 = Enemy not seen, 18 = Enemy between ultrasound 1 & 8, etc
-        struct us_sensor enemyLocation = getClosestEnemies();
-        if (enemyLocation.name == 0) {
-            moveTank(10, 10);
-            delayMicroseconds(50);
+        // Controller turned off at start
+        // By default, this will only be entered once, at the start
+        __set_BASEPRI(2 << 4);
+        while (get_RIGHT_KNOB() == 0) {
             moveTank(0, 0);
-            continue;
-        } else {
-            switch (enemyLocation.name) {
-                case 1: //Enemy is NNE, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNE\r\n", 12 - 1, 1000);
-                    moveTank(100, 80);
+            HAL_Delay(500);
+            printf("Controller is off!\n");
+        }
+
+        // Waiting mode
+        while (get_RIGHT_KNOB() > (RIGHT_KNOB_MIN + 100) &&
+               get_RIGHT_KNOB() < (RIGHT_KNOB_MAX - 100)) {
+            check_right_knob_online();
+            int INITIAL_MOVEMENT = 0;
+            moveTank(0, 0);
+            HAL_Delay(500);
+            printf("Waiting to start...\n");
+        }
+
+        // Control mode
+        while (get_RIGHT_KNOB() > RIGHT_KNOB_MAX - 100) {
+            check_right_knob_online();
+
+            int right_toggle = (int) get_RIGHT_TOGGLE();
+            int left_toggle = (int) get_LEFT_TOGGLE();
+            printf("\nControl mode\n");
+            printf("Right toggle Diff is %d\n", right_toggle);
+            printf("Right Knob Diff is %d\n", (int) get_RIGHT_KNOB());
+            printf("Left toggle is %d\n", left_toggle);
+            HAL_Delay(5);
+
+            float steering = (float) (right_toggle - RIGHT_TOGGLE_MIN) /
+                             (float) (RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) *
+                             200 - 100;
+            float speed = (float) (left_toggle - LEFT_TOGGLE_MIN) /
+                          (float) (LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 -
+                          100;
+            printf("steering: %d\n", (int) steering);
+            printf("speed: %d\n", (int) speed);
+            moveSteering((int) speed, (int) steering);
+
+        }
+        __set_BASEPRI(5 << 4);
+
+        // Auto mode
+        while (get_RIGHT_KNOB() < RIGHT_KNOB_MIN + 100) {
+            printf("Automode\n");
+
+            if (!INITIAL_MOVEMENT) {
+                moveTank(-60, -100);
+                HAL_Delay(400);
+                INITIAL_MOVEMENT = 1;
+                moveTank(0, 0);
+                HAL_Delay(2000);
+            }
+
+            int dist1 = getDistance(1);
+            int dist2 = getDistance(2);
+            int dist3 = getDistance(3);
+            int dist4 = getDistance(4);
+
+            printf("dist1: %03d\n", dist1);
+            printf("dist2: %03d\n", dist2);
+            printf("dist3: %03d\n", dist3);
+            printf("dist4: %03d\n", dist4);
+
+//            pollUART(&huart1,data);
+//            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+
+            struct us_sensor us1 = getClosestEnemies();
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+
+            printf("name: %d\n", enemyLocation);
+            printf("dist: %d\n", (int) distance);
+
+            switch (enemyLocation) {
+                case 1:
+                    moveTank(100, 100);
                     break;
                 case 2:
-                    // Enemy is NE, move more to the right
-                    HAL_UART_Transmit(&huart2, "moving ENE\r\n", 12 - 1, 1000);
-                    moveTank(100, 70);
+                    moveTank(60, -60);
                     break;
                 case 3:
-                    // Enemy is ESE, turn right
-                    HAL_UART_Transmit(&huart2, "moving ESE\r\n", 12 - 1, 1000);
-                    moveTank(100, -50);
+                    moveTank(-60, 60);
                     break;
                 case 4:
-                    // Enemy is SSE, turn right faster
-                    HAL_UART_Transmit(&huart2, "moving SSE\r\n", 12 - 1, 1000);
-                    moveTank(100, -75);
-                    break;
-                case 5:
-                    // Enemy is SSW, turn left faster
-                    HAL_UART_Transmit(&huart2, "moving SSW\r\n", 12 - 1, 1000);
-                    moveTank(-75, 100);
-                    break;
-                case 6:
-                    // Enemy is WSW, turn left
-                    HAL_UART_Transmit(&huart2, "moving WSW\r\n", 12 - 1, 1000);
-                    moveTank(-50, 100);
-                    break;
-                case 7:
-                    // Enemy is NW, move more to the left
-                    HAL_UART_Transmit(&huart2, "moving WNW\r\n", 12 - 1, 1000);
-                    moveTank(70, 100);
-                    break;
-                case 8://Enemy is NNW, move slightly to the right
-                    HAL_UART_Transmit(&huart2, "moving NNW\r\n", 12 - 1, 1000);
                     moveTank(80, 100);
                     break;
+                case 5:
+                    moveTank(100, 80);
+                    break;
             }
-            HAL_Delay(50);
+
+            HAL_Delay(500);
         }
     }
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -327,7 +286,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
@@ -336,7 +296,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+int getTOF1() {
+    return tof1;
+}
 
+int getTOF2() {
+    return tof2;
+}
 /* USER CODE END 4 */
 
 /**
@@ -346,7 +312,7 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+    /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }

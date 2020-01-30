@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "gpio.h"
-#include "delayMicrosec.h"
+#include "utils.h"
+#include "main.h"
+#define MAX_DISTANCE_IN_CM 200
 
 struct us_sensor{
     int name;
@@ -15,11 +17,8 @@ struct us_sensor{
     uint32_t Echo_Pin;
 };
 
-struct us_sensor createSensor(int name, GPIO_TypeDef* Trig_Port, uint32_t Trig_Pin, GPIO_TypeDef* Echo_Port, uint32_t Echo_Pin);
-
-float getDistance(struct us_sensor sensor);
+float getDistance(int sensorChoose);
 
 struct us_sensor getClosestEnemies();
-
 
 #endif
