@@ -22,12 +22,6 @@ struct us_sensor ultrasoundsensor3 = {00, -1,
                                       ultrasound3_echo_GPIO_Port,
                                       ultrasound3_echo_Pin};
 
-struct us_sensor ultrasoundsensor4 = {00, -1,
-                                      ultrasound_trigger_GPIO_Port,
-                                      ultrasound_trigger_Pin,
-                                      ultrasound4_echo_GPIO_Port,
-                                      ultrasound4_echo_Pin};
-
 // Used to check for timeout, notice this is reverse math to calculate dist
 static const int LOCAL_TIME_MAX = MAX_DISTANCE_IN_CM * 10 / 3 * 2 / 0.343;
 
@@ -50,9 +44,6 @@ float getDistance(int ultrasoundChoose) {
             break;
         case 3 :
             sensor = ultrasoundsensor3;
-            break;
-        case 4 :
-            sensor = ultrasoundsensor4;
             break;
         default :
             return -1;
@@ -96,22 +87,34 @@ float getDistance(int ultrasoundChoose) {
     return cachedDistance;
 }
 
-struct us_sensor getClosestEnemies() {
-    float sensor[4];
-
-    sensor[0] = getDistance(1);
-    sensor[1] = getDistance(2);
-    sensor[2] = getDistance(3);
-    sensor[3] = getDistance(4);
-
+struct us_sensor getClosestEnemies(int tof1, int tof2) {
     int min_dist = MAX_DISTANCE_IN_CM * 10;
     int min_sensor = 0;
 
-    // Loops through to find closest enemy
-    for (int i=0; i<4; i++) {
-        if (sensor[i] < min_dist) {
-            min_dist = sensor[i];
-            min_sensor = i + 1;
+    if (tof1 <MAX_DISTANCE_IN_CM || tof2 < MAX_DISTANCE_IN_CM){
+        if (tof1<MAX_DISTANCE_IN_CM && tof2<MAX_DISTANCE_IN_CM){
+            min_dist = tof1;
+            min_sensor = 1;
+        } else if (tof1 < MAX_DISTANCE_IN_CM){
+            min_dist = tof1;
+            min_sensor = 4;
+        } else {
+            min_dist = tof2;
+            min_sensor = 5;
+        }
+    }  else {
+        float sensor[3];
+
+        sensor[0] = getDistance(1);
+        sensor[1] = getDistance(2);
+        sensor[2] = getDistance(3);
+
+        // Loops through to find closest enemy
+        for (int i=0; i<3; i++) {
+            if (sensor[i] < min_dist) {
+                min_dist = sensor[i];
+                min_sensor = i + 1;
+            }
         }
     }
 

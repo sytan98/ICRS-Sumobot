@@ -30,6 +30,7 @@
 #include "distance.h"
 #include "motor.h"
 #include "init_tests.h"
+#include "UARTlink.h"
 
 /* USER CODE END Includes */
 
@@ -123,16 +124,17 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM15_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  DWT_Init();
-  pwm_init();
-
-    if (TESTING_MODE) {
-        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
-        printf("ENTERING TESTING MODE\n\n");
-        run_tests();
-        __set_BASEPRI(5 << 4); // Re-enables IR interrupts
-    }
+//  DWT_Init();
+//  pwm_init();
+//
+//    if (TESTING_MODE) {
+//        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
+//        printf("ENTERING TESTING MODE\n\n");
+//        run_tests();
+//        __set_BASEPRI(5 << 4); // Re-enables IR interrupts
+//    }
 
   //Reads for CH1 on rc receiver (right toggle)
   HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
@@ -144,13 +146,31 @@ int main(void)
   HAL_Delay(2000);
   int BREAK_RC = 0;
   int INITIAL_MOVEMENT = 0;
+  uint8_t data[14];
+  uint8_t request[1]={'0'};
+  int8_t packet;
+  int32_t power;
+  int16_t heading;
+  int16_t deltaX;
+  int16_t deltaY;
+  int16_t tof1;
+  int16_t tof2;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
         // TEST STUFF
-
+        printf("Hi\n");
+        pollUART(&huart1,data);
+        parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+        for (int i = 0 ; i < 14; i++){
+            printf("%d ", data[i]);
+        }
+        printf("\n");
+        printf("time of flight 1 is %d\n",tof1);
+        printf("time of flight 2 is %d\n",tof2);
+        HAL_Delay(500);
         // TEST STUFF END
 
         // Controller turned off
@@ -216,36 +236,38 @@ int main(void)
             printf("dist3: %03d\n", dist3);
             printf("dist4: %03d\n", dist4);
 
-//            struct us_sensor us1 = getClosestEnemies();
-//            int enemyLocation = us1.name;
-//            float distance = us1.distance;
-//
-//            printf("name: %d\n", enemyLocation);
-//            printf("dist: %d\n", (int) distance);
-//
-//            switch (enemyLocation) {
-//                case 1:
-//                    moveTank(100, -100);
-//                    break;
-//                case 2:
-//                    moveTank(60, -60);
-//                    break;
-//                case 3:
-//                    moveTank(60, 60);
-//                    break;
-//                case 4:
-//                    moveTank(-60, 60);
-//                    break;
-//            }
+//            pollUART(&huart1,data);
+//            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
+
+            struct us_sensor us1 = getClosestEnemies(tof1, tof2);
+            int enemyLocation = us1.name;
+            float distance = us1.distance;
+
+            printf("name: %d\n", enemyLocation);
+            printf("dist: %d\n", (int) distance);
+
+            switch (enemyLocation) {
+                case 1:
+                    moveTank(100, 100);
+                    break;
+                case 2:
+                    moveTank(60, -60);
+                    break;
+                case 3:
+                    moveTank(-60, 60);
+                    break;
+                case 4:
+                    moveTank(80, 100);
+                    break;
+                case 5:
+                    moveTank(100, 80);
+                    break;
+            }
 
             HAL_Delay(500);
 
-//            float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
-//            if (tofData[0] > 0 && tofData[1] > 0) {
-//                moveTank(100, 100); // Enemy is in front
-//            }
 
-        }
+//        }
     }
     /* USER CODE END WHILE */
 
@@ -288,7 +310,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {

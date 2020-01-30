@@ -18,6 +18,6 @@ struct us_sensor{
 
 float getDistance(int ultrasoundChoose);
 
-struct us_sensor getClosestEnemies();
+struct us_sensor getClosestEnemies(int tof1, int tof2);
 
 #endif
