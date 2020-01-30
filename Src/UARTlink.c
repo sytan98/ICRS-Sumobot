@@ -3,10 +3,10 @@
 //
 #include "UARTlink.h"
 
-void pollUART(UART_HandleTypeDef *huart, uint8_t *data)	{
+void pollUART(UART_HandleTypeDef *uart, uint8_t *data)	{
     uint8_t request[1]={'0'};
-    HAL_UART_Transmit(huart,request,1,1);
-    HAL_UART_Receive(huart,data,sizeof(data),5);
+    HAL_UART_Transmit(uart,request,1,1);
+    HAL_UART_Receive(uart,data,14,200);
 }
 
 void parsePacket(uint8_t *packet,int32_t *power, int16_t *heading, int16_t *deltaX, int16_t *deltaY, int16_t *tof1, int16_t *tof2)	{
