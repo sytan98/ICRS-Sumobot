@@ -19,8 +19,9 @@
 void remoteControl_init();
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 void HAL_TIM_PeriodElapsedHalfCpltCallback(TIM_HandleTypeDef *htim);
-uint32_t get_RIGHT_KNOB();
-uint32_t get_LEFT_TOGGLE();
-uint32_t get_RIGHT_TOGGLE();
+int get_RIGHT_KNOB();
+int get_LEFT_TOGGLE();
+int get_RIGHT_TOGGLE();
+int check_right_knob_online();
 
 #endif //ICRS_SUMOBOT_REMOTECONTROL_H

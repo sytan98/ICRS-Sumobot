@@ -52,7 +52,7 @@
 
 /* USER CODE BEGIN PV */
 // Variables used in remote control
-extern int TESTING_MODE = 0;
+int TESTING_MODE = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -128,18 +128,21 @@ int main(void)
 
         // Controller turned off
         __set_BASEPRI(2 << 4);
-        while (CH2_Difference == 0) {
-            printf("Controller is off!\n");
-            printf("Right toggle Diff is %d\n", CH1_Difference);
-            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
-            printf("Left toggle is %d\n", CH3_Difference);
-            moveTank(0,0);
-            HAL_Delay(500);
-        }
+//        while (get_RIGHT_KNOB() == 0) {
+//            printf("Controller is off!\n");
+//            printf("Right toggle Diff is %d\n", get_RIGHT_TOGGLE());
+//            printf("Right Knob Diff is %d\n", (int)get_RIGHT_KNOB());
+//            printf("Left toggle is %d\n", get_LEFT_TOGGLE());
+//            moveTank(0,0);
+//            HAL_Delay(500);
+//        }
 
         // Waiting mode
-        while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
-        CH2_Difference < RIGHT_KNOB_MAX - 100) {
+        while (get_RIGHT_KNOB() > (RIGHT_KNOB_MIN + 100) &&
+        get_RIGHT_KNOB() < (RIGHT_KNOB_MAX - 100)) {
+
+            check_right_knob_online();
+
             printf("Waiting to start...\n");
             int INITIAL_MOVEMENT = 0;
             moveTank(0,0);
@@ -147,12 +150,14 @@ int main(void)
         }
 
         // Control mode
-        while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
-            int right_toggle = (int)CH1_Difference;
-                int left_toggle = (int)CH3_Difference;
+        while (get_RIGHT_KNOB() > RIGHT_KNOB_MAX - 100) {
+            check_right_knob_online();
+
+            int right_toggle = (int)get_RIGHT_TOGGLE();
+                int left_toggle = (int)get_LEFT_TOGGLE();
             printf("\nControl mode\n");
             printf("Right toggle Diff is %d\n", right_toggle);
-            printf("Right Knob Diff is %d\n", (int)CH2_Difference);
+            printf("Right Knob Diff is %d\n", (int)get_RIGHT_KNOB());
             printf("Left toggle is %d\n", left_toggle);
             HAL_Delay(5);
 
@@ -168,7 +173,7 @@ int main(void)
         __set_BASEPRI(5 << 4);
 
         // Auto mode
-        while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
+        while (get_RIGHT_KNOB() < RIGHT_KNOB_MIN + 100) {
             printf("Automode\n");
 
             if (!INITIAL_MOVEMENT) {
