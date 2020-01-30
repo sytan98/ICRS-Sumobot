@@ -122,8 +122,7 @@ int main(void)
     remoteControl_init();
 
     if (TESTING_MODE) {
-        __set_BASEPRI(
-                2 << 4); // Disables all interrupts with priority 2 or lower
+        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
         printf("ENTERING TESTING MODE\n\n");
         run_tests();
         __set_BASEPRI(5 << 4); // Re-enables IR interrupts
@@ -161,7 +160,7 @@ int main(void)
         while (get_RIGHT_KNOB() > (RIGHT_KNOB_MIN + 100) &&
                get_RIGHT_KNOB() < (RIGHT_KNOB_MAX - 100)) {
             check_right_knob_online();
-            int INITIAL_MOVEMENT = 0;
+            INITIAL_MOVEMENT = 0;
             moveTank(0, 0);
             HAL_Delay(500);
             printf("Waiting to start...\n");
@@ -208,11 +207,13 @@ int main(void)
             int dist2 = getDistance(2);
             int dist3 = getDistance(3);
             int dist4 = getDistance(4);
+            int dist5 = getDistance(5);
 
             printf("dist1: %03d\n", dist1);
             printf("dist2: %03d\n", dist2);
             printf("dist3: %03d\n", dist3);
             printf("dist4: %03d\n", dist4);
+            printf("dist5: %03d\n", dist5);
 
 //            pollUART(&huart1,data);
 //            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
