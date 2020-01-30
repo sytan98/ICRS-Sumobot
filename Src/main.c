@@ -40,7 +40,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TESTING_MODE 0
 #define RIGHT_KNOB_MAX 1805
 #define RIGHT_KNOB_MIN 896
 #define RIGHT_TOGGLE_MAX 1711
@@ -58,6 +57,8 @@
 
 /* USER CODE BEGIN PV */
 // Variables used in remote control
+extern int TESTING_MODE = 0;
+
 uint32_t CH3_Val1 = 0;
 uint32_t CH3_Val2 = 0;
 uint32_t CH3_Difference = 0;
@@ -142,6 +143,7 @@ int main(void)
 
   HAL_Delay(2000);
   int BREAK_RC = 0;
+  int INITIAL_MOVEMENT = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -152,12 +154,13 @@ int main(void)
         // TEST STUFF END
 
         // Controller turned off
+        __set_BASEPRI(2 << 4);
         while (CH2_Difference == 0) {
             printf("Controller is off!\n");
             printf("Right toggle Diff is %d\n", CH1_Difference);
             printf("Right Knob Diff is %d\n", (int)CH2_Difference);
             printf("Left toggle is %d\n", CH3_Difference);
-
+            moveTank(0,0);
             HAL_Delay(500);
         }
 
@@ -165,11 +168,12 @@ int main(void)
         while (CH2_Difference > RIGHT_KNOB_MIN + 100 &
         CH2_Difference < RIGHT_KNOB_MAX - 100) {
             printf("Waiting to start...\n");
+            int INITIAL_MOVEMENT = 0;
+            moveTank(0,0);
             HAL_Delay(500);
         }
 
         // Control mode
-        __set_BASEPRI(2 << 4);
         while (CH2_Difference > RIGHT_KNOB_MAX - 100 && !BREAK_RC) {
             int right_toggle = (int)CH1_Difference;
                 int left_toggle = (int)CH3_Difference;
@@ -177,15 +181,16 @@ int main(void)
             printf("Right toggle Diff is %d\n", right_toggle);
             printf("Right Knob Diff is %d\n", (int)CH2_Difference);
             printf("Left toggle is %d\n", left_toggle);
-//            HAL_Delay(500);
+            HAL_Delay(5);
 
             float steering = (float)(right_toggle - RIGHT_TOGGLE_MIN) /
                     (float)(RIGHT_TOGGLE_MAX - RIGHT_TOGGLE_MIN) * 200 - 100;
             float speed = (float)(left_toggle - LEFT_TOGGLE_MIN) /
                     (float)(LEFT_TOGGLE_MAX - LEFT_TOGGLE_MIN) * 200 - 100;
-//            printf("steering: %d\n", (int) steering);
-//            printf("speed: %d\n", (int) speed);
-//            moveSteering((int)speed, (int) steering);
+            printf("steering: %d\n", (int) steering);
+            printf("speed: %d\n", (int) speed);
+            moveSteering((int)speed, (int) steering);
+
         }
         __set_BASEPRI(5 << 4);
 
@@ -193,21 +198,53 @@ int main(void)
         while (CH2_Difference < RIGHT_KNOB_MIN + 100) {
             printf("Automode\n");
 
-            struct us_sensor us1 = getClosestEnemies();
-            int enemyLocation = us1.name;
-            float distance = us1.distance;
+            if (!INITIAL_MOVEMENT) {
+                moveTank(-60, -100);
+                HAL_Delay(400);
+                INITIAL_MOVEMENT = 1;
+                moveTank(0,0);
+                HAL_Delay(2000);
+            }
 
-            printf("name: %d\n", enemyLocation);
-            printf("dist: %d\n", (int) distance);
+            int dist1 = getDistance(1);
+            int dist2 = getDistance(2);
+            int dist3 = getDistance(3);
+            int dist4 = getDistance(4);
 
-//            moveTank(50,50);
+            printf("dist1: %03d\n", dist1);
+            printf("dist2: %03d\n", dist2);
+            printf("dist3: %03d\n", dist3);
+            printf("dist4: %03d\n", dist4);
+
+//            struct us_sensor us1 = getClosestEnemies();
+//            int enemyLocation = us1.name;
+//            float distance = us1.distance;
+//
+//            printf("name: %d\n", enemyLocation);
+//            printf("dist: %d\n", (int) distance);
+//
+//            switch (enemyLocation) {
+//                case 1:
+//                    moveTank(100, -100);
+//                    break;
+//                case 2:
+//                    moveTank(60, -60);
+//                    break;
+//                case 3:
+//                    moveTank(60, 60);
+//                    break;
+//                case 4:
+//                    moveTank(-60, 60);
+//                    break;
+//            }
+
+            HAL_Delay(500);
 
 //            float tofData[2] = {-1, -1}; // replace -1 with getTOFData()
 //            if (tofData[0] > 0 && tofData[1] > 0) {
 //                moveTank(100, 100); // Enemy is in front
 //            }
 
-            HAL_Delay(500);
         }
     }
     /* USER CODE END WHILE */

@@ -75,10 +75,4 @@ void lineDetected(int n) {
             }
         }
     }
-
-    __HAL_GPIO_EXTI_CLEAR_IT(infrared1_Pin);
-    __HAL_GPIO_EXTI_CLEAR_IT(infrared2_Pin);
-    __HAL_GPIO_EXTI_CLEAR_IT(infrared3_Pin);
-    __HAL_GPIO_EXTI_CLEAR_IT(infrared4_Pin);
-    moveTank(0,0);
 }
