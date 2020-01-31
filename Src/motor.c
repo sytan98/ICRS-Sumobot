@@ -29,6 +29,10 @@ void pwm_init(void){
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 }
 void analogWrite(int channel, int speed){
+    int pow = getPower();
+    if (pow>30000){
+        speed = (int)(speed * (float)30000/(float)pow);
+    }
     switch(channel)
     {
         case 1:

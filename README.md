@@ -30,7 +30,8 @@ Before programming your application, you have to write an start up file, initial
 
 Pin assignments using STM32CubeMX and use clock configuration to control clocking speed.
 
-![alt text](https://github.com/sytan98/ICRS-Sumobot/blob/master/images/stm32config.PNG "stm32config")
+![alt text](https://github.com/sytan98/ICRS-Sumobot/blob/master/images/Pinconfig.png "Pinconfig")
+![alt text](https://github.com/sytan98/ICRS-Sumobot/blob/master/images/stm32config.PNG "STM32config")
 
 3. Generate Code
 

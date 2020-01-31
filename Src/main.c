@@ -71,7 +71,6 @@ void torqueCheck();
 int INITIAL_MOVEMENT = 0;
 uint8_t data[14];
 uint8_t request[1] = {'0'};
-int8_t packet;
 int32_t power;
 int16_t heading;
 int16_t deltaX;
@@ -300,6 +299,22 @@ int getTOF1() {
 
 int getTOF2() {
     return tof2;
+}
+
+int getPower() {
+    return power;
+}
+
+int getHead() {
+    return heading;
+}
+
+int getDeltaX() {
+    return deltaX;
+}
+
+int getDeltaY() {
+    return deltaY;
 }
 /* USER CODE END 4 */
 
