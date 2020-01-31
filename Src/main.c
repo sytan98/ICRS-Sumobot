@@ -295,11 +295,11 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 int getTOF1() {
-    return tof1;
+    return (int) ((float) tof1 / 10);
 }
 
 int getTOF2() {
-    return tof2;
+    return (int) ((float) tof2 / 10);
 }
 /* USER CODE END 4 */
 
