@@ -133,8 +133,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1) {
         // TEST STUFF
-        __set_BASEPRI(2 << 4);
-            printf("Hi\n");
+        printf("Hi\n");
         pollUART(&huart1, data);
         parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
         for (int i = 0; i < 14; i++) {
@@ -160,7 +159,7 @@ int main(void)
         while (get_RIGHT_KNOB() > (RIGHT_KNOB_MIN + 100) &&
                get_RIGHT_KNOB() < (RIGHT_KNOB_MAX - 100)) {
             check_right_knob_online();
-            int INITIAL_MOVEMENT = 0;
+            INITIAL_MOVEMENT = 0;
             moveTank(0, 0);
             HAL_Delay(500);
             printf("Waiting to start...\n");
