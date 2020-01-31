@@ -52,13 +52,10 @@ static void infrared_test() {
                                            infrared2_gpio_Pin);
         ir_booleans[2] = !HAL_GPIO_ReadPin(infrared3_gpio_GPIO_Port,
                                            infrared3_gpio_Pin);
-        ir_booleans[3] = !HAL_GPIO_ReadPin(infrared4_gpio_GPIO_Port,
-                                           infrared4_gpio_Pin);
 
         printf("\nInfrared 1 boolean: %01d\n", ir_booleans[0]);
         printf("Infrared 2 boolean: %01d\n", ir_booleans[1]);
         printf("Infrared 3 boolean: %01d\n", ir_booleans[2]);
-        printf("Infrared 4 boolean: %01d\n", ir_booleans[3]);
 
         HAL_Delay(500);
     }

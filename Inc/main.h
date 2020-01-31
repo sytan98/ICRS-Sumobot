@@ -92,6 +92,11 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 int getTOF1();
 int getTOF2();
+int getPower();
+int getHeading();
+int getDeltaX();
+int getDeltaY();
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
