@@ -87,8 +87,6 @@ int16_t tof2;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-    uint8_t hello[15] = "Hello World!\n";
-    printf(hello);
   /* USER CODE END 1 */
   
 
@@ -122,8 +120,7 @@ int main(void)
     remoteControl_init();
 
     if (TESTING_MODE) {
-        __set_BASEPRI(
-                2 << 4); // Disables all interrupts with priority 2 or lower
+        __set_BASEPRI(2 << 4); // Disables all interrupts with priority 2 or lower
         printf("ENTERING TESTING MODE\n\n");
         run_tests();
         __set_BASEPRI(5 << 4); // Re-enables IR interrupts
@@ -136,7 +133,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
     while (1) {
         // TEST STUFF
-        printf("Hi\n");
+        __set_BASEPRI(2 << 4);
+            printf("Hi\n");
         pollUART(&huart1, data);
         parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
         for (int i = 0; i < 14; i++) {
@@ -146,6 +144,7 @@ int main(void)
         printf("time of flight 1 is %d\n", tof1);
         printf("time of flight 2 is %d\n", tof2);
         HAL_Delay(500);
+
         // TEST STUFF END
 
         // Controller turned off at start
@@ -204,20 +203,20 @@ int main(void)
                 HAL_Delay(2000);
             }
 
-            int dist1 = getDistance(1);
-            int dist2 = getDistance(2);
-            int dist3 = getDistance(3);
-            int dist4 = getDistance(4);
+//            int dist1 = getDistance(1);
+//            int dist2 = getDistance(2);
+//            int dist3 = getDistance(3);
+//            int dist4 = getDistance(4);
+//
+//            printf("dist1: %03d\n", dist1);
+//            printf("dist2: %03d\n", dist2);
+//            printf("dist3: %03d\n", dist3);
+//            printf("dist4: %03d\n", dist4);
 
-            printf("dist1: %03d\n", dist1);
-            printf("dist2: %03d\n", dist2);
-            printf("dist3: %03d\n", dist3);
-            printf("dist4: %03d\n", dist4);
+            pollUART(&huart1, data);
+            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
 
-//            pollUART(&huart1,data);
-//            parsePacket(data, &power, &heading, &deltaX, &deltaY, &tof1, &tof2);
-
-            struct us_sensor us1 = getClosestEnemies(tof1, tof2);
+            struct us_sensor us1 = getClosestEnemies();
             int enemyLocation = us1.name;
             float distance = us1.distance;
 
