@@ -1,9 +1,6 @@
-#include <INA219.h>
+#include <Adafruit_INA219.h>
 #include "Adafruit_VL53L0X.h"
-#include <Adafruit_LSM303DLH_Mag.h>
-#include <Adafruit_Sensor.h>
 #include <Wire.h>
-#include "Bitcraze_PMW3901.h"
 
 // address we will assign if dual sensor is present
 #define LOX1_ADDRESS 0x30
@@ -21,17 +18,12 @@
 // objects for the vl53l0x
 Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
 Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
-// objects for mag sensor
-Adafruit_LSM303DLH_Mag_Unified mag = Adafruit_LSM303DLH_Mag_Unified(12345);
 
-// Using digital pin 10 for chip select
-Bitcraze_PMW3901 flow(10);
-
-INA219 ina219;
+Adafruit_INA219 ina219;
 
 int32_t power=0;
-//float voltage=0;
-//float current=0;
+float voltage=0;
+float current=0;
 
 byte dataPacket[14];
 
@@ -46,22 +38,18 @@ int range2=0;
 void setID();
 // Reads two TOF sensors.
 void read_dual_sensors();
-// Reads compass.
-void read_compass();
 
 int heading=0;
 
-// Reads deltax,y.
-void read_dxdy();
-
 const float Pi = 3.14159;
-int16_t deltaX,deltaY;
+int16_t deltaX = 0;
+int16_t deltaY = 0;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(38400);
   
-  while(!Serial);
+  while(!Serial){ delay(1);}
   
   Serial.setTimeout(2);
 
@@ -77,8 +65,6 @@ void setup() {
   //Serial.println("Starting...");
   setID();
 
-  mag.begin();
-  flow.begin();
   //Serial.println("TOF sensors initialized.");
   
   //delay(1000);
@@ -86,22 +72,8 @@ void setup() {
   //Serial.println("Initializing compass.\n");
 
   /* Initialise the sensor */
-//  if (!mag.begin()) {
-//    /* There was a problem detecting the LSM303 ... check your connections */
-//    Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
-//    while(1);
-//  }
-
-//  delay(1000);
-//
-//  if (!flow.begin()) {
-//    Serial.println("Initialization of the flow sensor failed");
-//    while(1);
-//  }
 
   ina219.begin();
-  ina219.configure(INA219::RANGE_32V, INA219::GAIN_4_160MV, INA219::ADC_12BIT, INA219::ADC_12BIT, INA219::CONT_SH_BUS);
-  ina219.calibrate(SHUNT_R,SHUNT_MAX_V,BUS_MAX_V,MAX_CURRENT);
 
   //Serial.println("Start");
   
@@ -109,32 +81,20 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //read_dual_sensors();
-  //read_compass();
-  //read_dxdy();
 
-  flow.readMotionCount(&deltaX, &deltaY);
-  power=ina219.busPower()*1000;
-
-  sensors_event_t event;
-  mag.getEvent(&event);
-  // Calculate the angle of the vector y,x
-  heading = int((atan2(event.magnetic.y, event.magnetic.x) * 180) / Pi);
-  // Normalize to 0-360
-  if (heading < 0) {
-    heading = 360 + heading;
-  }
-
+//  read_dual_sensors();
+  power=ina219.getPower_mW();
+//  Serial.println(power);
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
   lox2.rangingTest(&measure2, false); // pass in 'true' to get debug data printout!
   if(measure1.RangeStatus != 4) {     // if not out of range
-    //Serial.print(measure1.RangeMilliMeter);
+//    Serial.println(measure1.RangeMilliMeter);
     range1=measure1.RangeMilliMeter;
   } else {
     range1=-1;
   }
   if(measure2.RangeStatus != 4) {
-    //Serial.print(measure2.RangeMilliMeter);
+//    Serial.println(measure2.RangeMilliMeter);
     range2=measure2.RangeMilliMeter;
   } else {
     range2=-1;
@@ -198,10 +158,10 @@ void setID() {
   lox2.begin(LOX2_ADDRESS);
 
   // initing LOX1
-//  if(!lox1.begin(LOX1_ADDRESS)) {
+  if(!lox1.begin(LOX1_ADDRESS)) {
 //    Serial.println(F("Failed to boot first VL53L0X"));
-//    while(1);
-//  }
+    while(1);
+  }
   delay(10);
 
   // activating LOX2
@@ -209,10 +169,10 @@ void setID() {
   delay(10);
 
   //initing LOX2
-//  if(!lox2.begin(LOX2_ADDRESS)) {
+  if(!lox2.begin(LOX2_ADDRESS)) {
 //    Serial.println(F("Failed to boot second VL53L0X"));
-//    while(1);
-//  }
+    while(1);
+  }
 }
 
 void read_dual_sensors() {
@@ -239,31 +199,4 @@ void read_dual_sensors() {
   }
   
   Serial.println();
-}
-
-void read_compass(){
-  sensors_event_t event;
-  mag.getEvent(&event);
-
-  // Calculate the angle of the vector y,x
-  float heading = (atan2(event.magnetic.y, event.magnetic.x) * 180) / Pi;
-
-  // Normalize to 0-360
-  if (heading < 0) {
-    heading = 360 + heading;
-  }
-  Serial.print("Compass Heading: ");
-  Serial.println(heading);
-  delay(500);
-}
-
-void read_dxdy(){
-  // Get motion count since last call
-  flow.readMotionCount(&deltaX, &deltaY);
-
-  Serial.print("X: ");
-  Serial.print(deltaX);
-  Serial.print(", Y: ");
-  Serial.print(deltaY);
-  Serial.print("\n");
 }
